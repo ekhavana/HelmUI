@@ -20,12 +20,12 @@ const toneClasses: Record<CardTone, string> = {
 
 export function Card({ title, eyebrow, children, className = '', tone = 'default' }: CardProps) {
   return (
-    <section className={`rounded-3xl border ${toneClasses[tone]} p-5 backdrop-blur-md ${className}`}>
+    <section className={`min-h-0 overflow-hidden rounded-2xl border ${toneClasses[tone]} p-3 backdrop-blur-md xl:rounded-3xl xl:p-5 ${className}`}>
       {(title || eyebrow) && (
-        <header className="mb-3 flex items-start justify-between gap-3">
+        <header className="mb-2 flex items-start justify-between gap-2 xl:mb-3 xl:gap-3">
           <div>
-            {eyebrow && <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">{eyebrow}</div>}
-            {title && <h2 className="mt-1 text-xl font-semibold text-slate-100">{title}</h2>}
+            {eyebrow && <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400 xl:text-xs">{eyebrow}</div>}
+            {title && <h2 className="mt-1 text-sm font-semibold text-slate-100 xl:text-xl">{title}</h2>}
           </div>
         </header>
       )}

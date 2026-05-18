@@ -5,7 +5,7 @@ import { StatusBar } from './StatusBar';
 
 export function AppShell() {
   return (
-    <main className="mx-auto flex h-screen max-h-[1080px] min-h-[720px] w-screen max-w-[1920px] flex-col gap-4 p-5">
+    <main className="mx-auto flex h-screen max-h-[1080px] min-h-[640px] w-screen max-w-[1920px] flex-col gap-3 p-3">
       <SafetyStrip />
       <ModeScreen />
       <BottomNav />
