@@ -11,7 +11,7 @@ export function WaterTempCard() {
     <Card title="Water Temp" eyebrow="Sea">
       <div className="flex items-center justify-between">
         <div className="text-5xl font-bold tabular-nums text-white">{formatNumber(waterTemp)}<span className="text-2xl text-slate-300"> °C</span></div>
-        <ThermometerSun className="h-14 w-14 shrink-0 text-cyan-200/80" />
+        <ThermometerSun className="h-10 w-10 shrink-0 text-cyan-200/80" />
       </div>
       <div className="mt-3">
         <MiniTrend />

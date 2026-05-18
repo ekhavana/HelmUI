@@ -6,7 +6,7 @@ import { GpsCard } from '../cards/GpsCard';
 
 export function SafetyStrip() {
   return (
-    <div className="grid h-32 shrink-0 grid-cols-[1.25fr_1fr_1fr_1fr_1fr] gap-4">
+    <div className="grid h-full min-h-0 grid-cols-[1.25fr_1fr_1fr_1fr_1fr] gap-3">
       <DepthSafetyCard />
       <AisRiskCard />
       <AutopilotCard />

@@ -6,7 +6,7 @@ export function StatusBar() {
   const signalKState = useBoatStore((state) => state.signalKState);
 
   return (
-    <footer className="grid h-14 shrink-0 grid-cols-[1.1fr_1fr_1.25fr_1fr_0.8fr_0.75fr_auto] items-center gap-4 rounded-2xl border border-slate-700/70 bg-slate-950/55 px-5 text-base font-semibold text-slate-200 backdrop-blur-md">
+    <footer className="grid h-full min-h-0 grid-cols-[1.1fr_1fr_1.25fr_1fr_0.8fr_0.75fr_auto] items-center gap-4 rounded-2xl border border-slate-700/70 bg-slate-950/55 px-5 text-base font-semibold text-slate-200 backdrop-blur-md">
       <div className="flex items-center gap-2 text-emerald-200"><Bell className="h-5 w-5" /> Alarm Status: Clear</div>
       <div className="flex items-center gap-2"><Sunset className="h-5 w-5 text-amber-200" /> Sunset: {time.sunsetCountdown}</div>
       <div className="flex items-center gap-2"><Flag className="h-5 w-5 text-cyan-200" /> Next WP: Harbor Approach</div>

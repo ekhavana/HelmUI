@@ -11,9 +11,9 @@ export function SpeedCard() {
     <Card title="Speed" eyebrow="Motion" tone="active">
       <div className="flex items-center justify-between gap-4">
         <ValueReadout label="SOG" value={formatNumber(speed.sogKts)} unit="kt" size="lg" accent="text-cyan-100" />
-        <GaugeCircle className="h-16 w-16 shrink-0 text-cyan-200/80" />
+        <GaugeCircle className="h-12 w-12 shrink-0 text-cyan-200/80" />
       </div>
-      <div className="mt-4 rounded-2xl bg-slate-950/45 p-3">
+      <div className="mt-3 rounded-2xl bg-slate-950/45 p-3">
         <ValueReadout label="STW" value={formatNumber(speed.stwKts)} unit="kt" size="md" />
       </div>
     </Card>

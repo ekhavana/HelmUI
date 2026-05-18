@@ -9,11 +9,11 @@ export function EngineCard() {
   return (
     <Card title="Engine" eyebrow="Main">
       <div className="flex items-center justify-between gap-4">
-        <div className="space-y-2 text-lg font-semibold text-slate-200">
+        <div className="space-y-1 text-base font-semibold text-slate-200">
           <div>Coolant <span className="text-white">{formatCelsius(engine.coolantTempC)}</span></div>
           <div>Alternator <span className="text-white">{formatVoltage(engine.alternatorVoltage)}</span></div>
         </div>
-        <Cog className="h-14 w-14 shrink-0 text-cyan-200/80" />
+        <Cog className="h-10 w-10 shrink-0 text-cyan-200/80" />
       </div>
     </Card>
   );
