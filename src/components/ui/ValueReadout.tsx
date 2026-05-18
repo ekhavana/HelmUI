@@ -7,18 +7,18 @@ interface ValueReadoutProps {
 }
 
 const sizeClasses = {
-  md: 'text-xl lg:text-4xl',
-  lg: 'text-2xl lg:text-5xl',
-  xl: 'text-4xl lg:text-7xl',
+  md: 'text-4xl',
+  lg: 'text-5xl',
+  xl: 'text-7xl',
 };
 
 export function ValueReadout({ label, value, unit, size = 'lg', accent = 'text-white' }: ValueReadoutProps) {
   return (
     <div>
-      <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-400 lg:text-sm">{label}</div>
-      <div className={`flex items-baseline gap-1 font-bold leading-none tabular-nums lg:mt-1 lg:gap-2 ${accent}`}>
+      <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</div>
+      <div className={`mt-1 flex items-baseline gap-2 font-bold tabular-nums ${accent}`}>
         <span className={sizeClasses[size]}>{value}</span>
-        {unit && <span className="text-[10px] text-slate-300 lg:text-xl">{unit}</span>}
+        {unit && <span className="text-xl text-slate-300">{unit}</span>}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { AppShell } from './components/layout/AppShell';
+import { KioskFit } from './components/layout/KioskFit';
 import { runtimeConfig } from './config/runtime';
 import { createSignalKClient } from './signalk/client';
 import { useBoatStore } from './store/boatStore';
@@ -34,5 +35,9 @@ export default function App() {
     return () => client.disconnect();
   }, [applySignalKDelta, setSignalKState]);
 
-  return <AppShell />;
+  return (
+    <KioskFit width={1920} height={1080}>
+      <AppShell />
+    </KioskFit>
+  );
 }

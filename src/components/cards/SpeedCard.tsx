@@ -9,11 +9,11 @@ export function SpeedCard() {
 
   return (
     <Card title="Speed" eyebrow="Motion" tone="active">
-      <div className="flex items-center justify-between gap-2 lg:gap-4">
-        <ValueReadout label="SOG" value={formatNumber(speed.sogKts)} unit="kt" size="md" accent="text-cyan-100" />
-        <GaugeCircle className="h-7 w-7 shrink-0 text-cyan-200/80 lg:h-16 lg:w-16" />
+      <div className="flex items-center justify-between gap-4">
+        <ValueReadout label="SOG" value={formatNumber(speed.sogKts)} unit="kt" size="lg" accent="text-cyan-100" />
+        <GaugeCircle className="h-16 w-16 shrink-0 text-cyan-200/80" />
       </div>
-      <div className="mt-1 rounded-xl bg-slate-950/45 px-2 py-1 lg:mt-4 lg:rounded-2xl lg:p-3">
+      <div className="mt-4 rounded-2xl bg-slate-950/45 p-3">
         <ValueReadout label="STW" value={formatNumber(speed.stwKts)} unit="kt" size="md" />
       </div>
     </Card>

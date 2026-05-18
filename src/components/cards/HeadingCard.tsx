@@ -9,10 +9,10 @@ export function HeadingCard() {
   return (
     <Card title="Heading" eyebrow="True">
       <div className="flex items-center justify-between">
-        <div className="text-3xl font-bold leading-none tabular-nums text-white lg:text-6xl">{formatDegrees(navigation.headingTrue)}</div>
-        <Compass className="h-7 w-7 shrink-0 text-cyan-200/80 lg:h-16 lg:w-16" />
+        <div className="text-6xl font-bold tabular-nums text-white">{formatDegrees(navigation.headingTrue)}</div>
+        <Compass className="h-16 w-16 shrink-0 text-cyan-200/80" />
       </div>
-      <div className="mt-1 grid grid-cols-5 gap-1 text-center text-[9px] font-semibold text-slate-400 lg:mt-5 lg:gap-2 lg:text-xs">
+      <div className="mt-5 grid grid-cols-5 gap-2 text-center text-xs font-semibold text-slate-400">
         <span>N</span>
         <span>030</span>
         <span className="rounded-full bg-cyan-400/20 py-1 text-cyan-100">045</span>

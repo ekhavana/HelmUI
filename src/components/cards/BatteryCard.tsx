@@ -10,13 +10,13 @@ export function BatteryCard() {
   return (
     <Card title="House Battery" eyebrow="Electrical">
       <div className="flex items-center justify-between">
-        <div className="text-2xl font-bold leading-none tabular-nums text-white lg:text-6xl">{battery.housePercent}<span className="text-sm text-slate-300 lg:text-2xl">%</span></div>
-        <BatteryFull className="h-6 w-6 shrink-0 text-emerald-300/85 lg:h-16 lg:w-16" />
+        <div className="text-6xl font-bold tabular-nums text-white">{battery.housePercent}<span className="text-2xl text-slate-300">%</span></div>
+        <BatteryFull className="h-16 w-16 shrink-0 text-emerald-300/85" />
       </div>
-      <div className="mt-1 lg:mt-4">
+      <div className="mt-4">
         <Gauge value={battery.housePercent} tone="green" />
       </div>
-      <div className="mt-1 grid grid-cols-2 gap-2 text-[10px] font-semibold leading-tight text-slate-200 lg:mt-4 lg:gap-3 lg:text-lg">
+      <div className="mt-4 grid grid-cols-2 gap-3 text-lg font-semibold text-slate-200">
         <div>{formatVoltage(battery.houseVoltage)}</div>
         <div>{formatAmps(battery.currentAmps)}</div>
       </div>

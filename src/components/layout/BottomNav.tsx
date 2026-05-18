@@ -18,7 +18,7 @@ export function BottomNav() {
   const setMode = useBoatStore((state) => state.setMode);
 
   return (
-    <nav className="flex h-14 shrink-0 items-center justify-between gap-2 rounded-2xl border border-slate-700/70 bg-slate-950/55 p-2 backdrop-blur-md lg:h-24 lg:gap-3 lg:rounded-[2rem] lg:p-3">
+    <nav className="flex h-24 shrink-0 items-center justify-between gap-3 rounded-[2rem] border border-slate-700/70 bg-slate-950/55 p-3 backdrop-blur-md">
       {navItems.map((item) => (
         <IconButton key={item.mode} icon={item.icon} label={item.label} active={mode === item.mode} onClick={() => setMode(item.mode)} />
       ))}
