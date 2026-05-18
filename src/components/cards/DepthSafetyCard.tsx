@@ -10,14 +10,14 @@ export function DepthSafetyCard() {
   const tone = safety === 'danger' ? 'danger' : safety === 'warning' ? 'warning' : 'safe';
 
   return (
-    <Card className="h-full px-6 py-4" tone={tone}>
-      <div className="flex items-center gap-4">
-        <Waves className="h-9 w-9" />
+    <Card className="h-full px-3 py-2 lg:px-6 lg:py-4" tone={tone}>
+      <div className="flex h-full items-center gap-2 lg:gap-4">
+        <Waves className="h-5 w-5 shrink-0 lg:h-9 lg:w-9" />
         <div>
-          <div className="text-sm font-bold uppercase tracking-[0.22em] text-slate-300">Depth</div>
-          <div className="flex items-baseline gap-2 font-bold tabular-nums text-white">
-            <span className="text-6xl leading-none">{formatNumber(depth)}</span>
-            <span className="text-2xl text-slate-300">ft</span>
+          <div className="text-[9px] font-bold uppercase tracking-[0.22em] text-slate-300 lg:text-sm">Depth</div>
+          <div className="flex items-baseline gap-1 font-bold tabular-nums text-white lg:gap-2">
+            <span className="text-2xl leading-none lg:text-6xl">{formatNumber(depth)}</span>
+            <span className="text-xs text-slate-300 lg:text-2xl">ft</span>
           </div>
         </div>
       </div>

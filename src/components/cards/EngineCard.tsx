@@ -8,12 +8,12 @@ export function EngineCard() {
 
   return (
     <Card title="Engine" eyebrow="Main">
-      <div className="flex items-center justify-between gap-2 xl:gap-4">
-        <div className="space-y-0.5 text-[11px] font-semibold text-slate-200 xl:space-y-2 xl:text-lg">
+      <div className="flex items-center justify-between gap-2 lg:gap-4">
+        <div className="space-y-0 text-[10px] font-semibold leading-tight text-slate-200 lg:space-y-2 lg:text-lg">
           <div>Coolant <span className="text-white">{formatCelsius(engine.coolantTempC)}</span></div>
           <div>Alternator <span className="text-white">{formatVoltage(engine.alternatorVoltage)}</span></div>
         </div>
-        <Cog className="h-7 w-7 shrink-0 text-cyan-200/80 xl:h-14 xl:w-14" />
+        <Cog className="h-6 w-6 shrink-0 text-cyan-200/80 lg:h-14 lg:w-14" />
       </div>
     </Card>
   );
