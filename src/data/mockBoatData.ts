@@ -51,6 +51,6 @@ export const mockBoatData = {
     eta: '18:54',
     sunsetCountdown: '01:27',
   },
-} as const;
+};
 
 export type BoatData = typeof mockBoatData;
