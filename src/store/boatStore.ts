@@ -3,9 +3,13 @@ import { mockBoatData, type BoatData } from '../data/mockBoatData';
 import { applyBoatDataPatch, mapSignalKDelta } from '../signalk/mapDelta';
 import type { SignalKConnectionState, SignalKDeltaMessage } from '../signalk/types';
 
+export type AppMode = 'helm' | 'chart' | 'anchor' | 'engine' | 'systems' | 'ai' | 'menu';
+
 interface BoatStore {
   data: BoatData;
+  mode: AppMode;
   signalKState: SignalKConnectionState;
+  setMode: (mode: AppMode) => void;
   setBoatData: (data: BoatData) => void;
   setSignalKState: (signalKState: SignalKConnectionState) => void;
   applySignalKDelta: (delta: SignalKDeltaMessage) => void;
@@ -31,7 +35,9 @@ function currentLocalTime(): string {
 
 export const useBoatStore = create<BoatStore>((set) => ({
   data: mockBoatData,
+  mode: 'helm',
   signalKState: 'disabled',
+  setMode: (mode) => set({ mode }),
   setBoatData: (data) => set({ data }),
   setSignalKState: (signalKState) => set({ signalKState }),
   applySignalKDelta: (delta) =>
