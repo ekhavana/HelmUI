@@ -9,14 +9,14 @@ import { WindCard } from '../cards/WindCard';
 
 export function HelmScreen() {
   return (
-    <section className="grid min-h-0 flex-1 grid-cols-[320px_minmax(0,1fr)_360px] gap-4">
-      <aside className="flex min-h-0 flex-col gap-4">
+    <section className="grid min-h-0 flex-1 grid-cols-[174px_minmax(0,1fr)_204px] gap-2 xl:grid-cols-[320px_minmax(0,1fr)_360px] xl:gap-4">
+      <aside className="grid min-h-0 grid-rows-[1.12fr_1fr_1fr] gap-2 xl:gap-4">
         <SpeedCard />
         <HeadingCard />
         <WaterTempCard />
       </aside>
       <ChartPanel />
-      <aside className="flex min-h-0 flex-col gap-4">
+      <aside className="grid min-h-0 grid-rows-[1.18fr_1.02fr_0.9fr_0.9fr] gap-2 xl:gap-4">
         <WindCard />
         <BatteryCard />
         <BilgeCard />
