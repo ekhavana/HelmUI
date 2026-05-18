@@ -40,8 +40,41 @@ export const mockBoatData = {
     message: 'No Water Detected',
   },
   engine: {
+    rpm: 2450,
     coolantTempC: 68,
+    oilPressurePsi: 51,
+    hours: 1286.4,
+    fuelRateLph: 7.6,
     alternatorVoltage: 14.1,
+  },
+  tanks: {
+    fuelPercent: 72,
+    freshWaterPercent: 58,
+    wastePercent: 33,
+  },
+  power: {
+    solarWatts: 420,
+    loadWatts: 360,
+    inverterOn: false,
+  },
+  network: {
+    signalK: 'online',
+    mqtt: 'online',
+    nodered: 'degraded',
+  },
+  anchor: {
+    deployed: true,
+    rodeMeters: 38,
+    scopeRatio: 4.2,
+    radiusMeters: 24,
+    distanceFromSetMeters: 9.2,
+    alarmArmed: true,
+  },
+  route: {
+    nextWaypoint: 'Harbor Approach',
+    distanceNm: 6.4,
+    etaMinutes: 62,
+    crossTrackErrorNm: 0.08,
   },
   environment: {
     waterTempC: 17.2,
