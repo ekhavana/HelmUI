@@ -1,4 +1,5 @@
 import { LocateFixed, Navigation, Ship, Triangle } from 'lucide-react';
+import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { formatDegrees, formatKts, formatNumber } from '../../utils/formatters';
 import { Card } from '../ui/Card';
@@ -37,6 +38,7 @@ export function ChartScreen() {
       </aside>
 
       <Card className="relative overflow-hidden rounded-[2rem]" tone="active">
+        <div className="absolute inset-0 opacity-35" style={{ backgroundImage: `url(${runtimeConfig.chart.tileUrlTemplate})`, backgroundPosition: 'center', backgroundSize: 'cover' }} />
         <div className="absolute inset-0 opacity-30">
           <div className="h-full w-full bg-[linear-gradient(rgba(34,211,238,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.14)_1px,transparent_1px)] bg-[size:52px_52px]" />
         </div>
@@ -55,6 +57,9 @@ export function ChartScreen() {
             <div className="text-xs uppercase tracking-[0.18em] text-slate-400">Live Chart</div>
             <div className="text-base font-semibold">AIS + Route Overlay</div>
           </div>
+        </div>
+        <div className="pointer-events-none absolute right-6 top-6 rounded-xl border border-cyan-300/30 bg-slate-950/70 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-cyan-100">
+          {runtimeConfig.chart.offlineOnly ? 'Offline Tiles' : 'Hybrid Tiles'}
         </div>
       </Card>
 

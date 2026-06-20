@@ -1,1 +1,30 @@
-{"type":"module","scripts":{"dev":"vite --host 0.0.0.0","build":"tsc && vite build","preview":"vite preview --host 0.0.0.0"},"dependencies":{"@vitejs/plugin-react":"latest","framer-motion":"latest","lucide-react":"latest","react":"latest","react-dom":"latest","typescript":"latest","vite":"latest","zustand":"latest"},"devDependencies":{"@tailwindcss/postcss":"^4.3.0","@types/react":"latest","@types/react-dom":"latest","autoprefixer":"latest","postcss":"latest","tailwindcss":"latest"}}
+{
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "bridge": "node backend/bridge/server.mjs",
+    "test:bridge": "node --test backend/bridge/tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "framer-motion": "latest",
+    "lucide-react": "latest",
+    "mqtt": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "ws": "latest",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest"
+  }
+}

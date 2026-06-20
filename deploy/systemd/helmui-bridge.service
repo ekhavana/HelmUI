@@ -1,0 +1,16 @@
+[Unit]
+Description=HelmUI Telemetry Bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/helmui
+EnvironmentFile=/etc/default/helmui-bridge
+ExecStart=/usr/bin/npm run bridge
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

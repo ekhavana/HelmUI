@@ -1,12 +1,13 @@
 import { Waves } from 'lucide-react';
 import { useBoatStore } from '../../store/boatStore';
 import { formatNumber } from '../../utils/formatters';
-import { getDepthSafetyState } from '../../utils/thresholds';
 import { Card } from '../ui/Card';
 
 export function DepthSafetyCard() {
   const depth = useBoatStore((state) => state.data.depth.belowTransducerFt);
-  const safety = getDepthSafetyState(depth);
+  const depthWarningFt = useBoatStore((state) => state.settings.depthWarningFt);
+  const depthDangerFt = Math.max(2, depthWarningFt - 3);
+  const safety = depth < depthDangerFt ? 'danger' : depth <= depthWarningFt ? 'warning' : 'safe';
   const tone = safety === 'danger' ? 'danger' : safety === 'warning' ? 'warning' : 'safe';
 
   return (

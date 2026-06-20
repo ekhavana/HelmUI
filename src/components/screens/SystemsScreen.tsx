@@ -4,18 +4,13 @@ import { formatAmps, formatNumber, formatVoltage } from '../../utils/formatters'
 import { Card } from '../ui/Card';
 import { Gauge } from '../ui/Gauge';
 
-function statusTone(status: string): 'safe' | 'warning' | 'danger' {
-  if (status === 'online') return 'safe';
-  if (status === 'degraded') return 'warning';
-  return 'danger';
-}
-
 export function SystemsScreen() {
   const battery = useBoatStore((state) => state.data.battery);
   const bilge = useBoatStore((state) => state.data.bilge);
   const tanks = useBoatStore((state) => state.data.tanks);
   const power = useBoatStore((state) => state.data.power);
   const network = useBoatStore((state) => state.data.network);
+  const sourceHealth = useBoatStore((state) => state.sourceHealth);
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[1fr_1fr_1fr] gap-4">
@@ -67,16 +62,17 @@ export function SystemsScreen() {
         <div className="space-y-3">
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Radio className="h-4 w-4 text-cyan-200" /> Signal K</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${network.signalK === 'online' ? 'bg-emerald-500/20 text-emerald-200' : 'bg-amber-500/20 text-amber-200'}`}>{network.signalK}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceHealth.signalk.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.signalk.connected ? 'online' : 'down'}</span>
           </div>
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Server className="h-4 w-4 text-cyan-200" /> MQTT Broker</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${network.mqtt === 'online' ? 'bg-emerald-500/20 text-emerald-200' : 'bg-amber-500/20 text-amber-200'}`}>{network.mqtt}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceHealth.mqtt.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.mqtt.connected ? 'online' : 'down'}</span>
           </div>
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Cpu className="h-4 w-4 text-cyan-200" /> Node-RED</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${statusTone(network.nodered) === 'safe' ? 'bg-emerald-500/20 text-emerald-200' : statusTone(network.nodered) === 'warning' ? 'bg-amber-500/20 text-amber-200' : 'bg-red-500/20 text-red-200'}`}>{network.nodered}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.nodered.connected ? 'online' : 'down'}</span>
           </div>
+          <div className="rounded-2xl bg-slate-950/45 p-3 text-xs font-semibold text-slate-300">Last Node-RED seen: {sourceHealth.nodered.lastSeen ?? network.nodered}</div>
         </div>
       </Card>
     </section>

@@ -1,13 +1,9 @@
 import { Bot, Send, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { formatDegrees, formatNumber } from '../../utils/formatters';
 import { Card } from '../ui/Card';
-
-interface Message {
-  role: 'assistant' | 'user';
-  text: string;
-}
 
 function assistantReply(input: string, context: ReturnType<typeof buildContext>): string {
   const text = input.toLowerCase();
@@ -39,16 +35,18 @@ function buildContext(data: ReturnType<typeof useBoatStore.getState>['data']) {
 
 export function AiAssistantScreen() {
   const data = useBoatStore((state) => state.data);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: 'Assistant online. Ask for route status, engine summary, anchor watch, or systems snapshot.' },
-  ]);
+  const messages = useBoatStore((state) => state.aiMessages);
+  const addAiMessage = useBoatStore((state) => state.addAiMessage);
+  const clearAiMessages = useBoatStore((state) => state.clearAiMessages);
   const [input, setInput] = useState('');
   const context = useMemo(() => buildContext(data), [data]);
 
   const sendMessage = (text: string) => {
+    if (!runtimeConfig.ai.enabled) return;
     const trimmed = text.trim();
     if (!trimmed) return;
-    setMessages((prev) => [...prev, { role: 'user', text: trimmed }, { role: 'assistant', text: assistantReply(trimmed, context) }]);
+    addAiMessage({ role: 'user', text: trimmed });
+    addAiMessage({ role: 'assistant', text: assistantReply(trimmed, context) });
     setInput('');
   };
 
@@ -69,6 +67,7 @@ export function AiAssistantScreen() {
         <div className="mt-4 flex gap-2">
           <input
             className="flex-1 rounded-xl border border-slate-600 bg-slate-950/65 px-4 py-3 text-sm font-semibold text-slate-100 outline-none focus:border-cyan-300/60"
+            disabled={!runtimeConfig.ai.enabled}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') sendMessage(input);
@@ -77,7 +76,8 @@ export function AiAssistantScreen() {
             value={input}
           />
           <button
-            className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/35 bg-cyan-500/15 px-4 py-3 text-sm font-semibold text-cyan-100"
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/35 bg-cyan-500/15 px-4 py-3 text-sm font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!runtimeConfig.ai.enabled}
             onClick={() => sendMessage(input)}
             type="button"
           >
@@ -85,6 +85,7 @@ export function AiAssistantScreen() {
             Send
           </button>
         </div>
+        {!runtimeConfig.ai.enabled ? <div className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">AI Assistant is disabled in production profile.</div> : null}
       </Card>
 
       <aside className="flex min-h-0 flex-col gap-4">
@@ -101,6 +102,13 @@ export function AiAssistantScreen() {
               </button>
             ))}
           </div>
+          <button
+            className="mt-3 w-full rounded-xl border border-slate-700/70 bg-slate-900/60 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-cyan-300/45 hover:text-cyan-100"
+            onClick={clearAiMessages}
+            type="button"
+          >
+            Clear chat history
+          </button>
         </Card>
         <Card title="Safety Guardrail" eyebrow="Non-Blocking" tone="warning">
           <div className="flex items-start gap-3 text-sm font-semibold text-amber-100">

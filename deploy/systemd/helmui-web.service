@@ -1,0 +1,16 @@
+[Unit]
+Description=HelmUI Web Runtime
+After=network-online.target helmui-bridge.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/helmui
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run preview
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
