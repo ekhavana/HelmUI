@@ -6,6 +6,7 @@ import { evaluateAlarms } from '../domain/alarms/evaluateAlarms';
 import type { AlarmItem } from '../domain/alarms/types';
 import { applyBoatDataPatch, mapSignalKDelta } from '../signalk/mapDelta';
 import type { SignalKConnectionState, SignalKDeltaMessage } from '../signalk/types';
+import { haversineMeters } from '../utils/geo';
 
 export type AppMode = 'helm' | 'chart' | 'anchor' | 'engine' | 'systems' | 'ai' | 'menu';
 
@@ -39,6 +40,8 @@ interface BoatStore {
   updateSettings: (patch: Partial<UiSettings>) => void;
   resetSettings: () => void;
   setAnchorRadius: (radiusMeters: number) => void;
+  setAnchorPosition: (lat: number, lon: number) => void;
+  clearAnchorPosition: () => void;
   addAiMessage: (message: AssistantMessage) => void;
   clearAiMessages: () => void;
   setSignalKState: (signalKState: SignalKConnectionState) => void;
@@ -74,13 +77,12 @@ function drift(value: number, amount: number, min: number, max: number): number 
   return clamp(value + (Math.random() - 0.5) * amount, min, max);
 }
 
-function pad(value: number): string {
-  return value.toString().padStart(2, '0');
-}
-
-function currentLocalTime(): string {
-  const now = new Date();
-  return `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+function withAnchorDrift(data: BoatData): BoatData {
+  const { anchorLat, anchorLon } = data.anchor;
+  const { latitude, longitude } = data.navigation;
+  if (anchorLat === null || anchorLon === null || latitude === null || longitude === null) return data;
+  const distanceFromSetMeters = haversineMeters(anchorLat, anchorLon, latitude, longitude);
+  return { ...data, anchor: { ...data.anchor, distanceFromSetMeters } };
 }
 
 function mergeBoatData(base: BoatData, patch: Partial<BoatData>): BoatData {
@@ -153,6 +155,20 @@ export const useBoatStore = create<BoatStore>()(
             sourceHealth: state.sourceHealth,
           }),
         })),
+      setAnchorPosition: (lat, lon) =>
+        set((state) => ({
+          data: {
+            ...state.data,
+            anchor: { ...state.data.anchor, anchorLat: lat, anchorLon: lon, deployed: true },
+          },
+        })),
+      clearAnchorPosition: () =>
+        set((state) => ({
+          data: {
+            ...state.data,
+            anchor: { ...state.data.anchor, anchorLat: null, anchorLon: null, deployed: false },
+          },
+        })),
       setAnchorRadius: (radiusMeters) =>
         set((state) => {
           const data = {
@@ -199,12 +215,13 @@ export const useBoatStore = create<BoatStore>()(
       applyBridgeMessage: (message) =>
         set((state) => {
           const sourceHealth = message.sources ?? state.sourceHealth;
-          const nextData =
+          const nextData = withAnchorDrift(
             message.type === 'snapshot'
               ? mergeBoatData(state.data, message.data)
               : message.type === 'delta'
                 ? mergeBoatData(state.data, message.patch)
-                : state.data;
+                : state.data,
+          );
           const alarms = evaluateAlarms({
             data: nextData,
             settings: state.settings,
@@ -221,7 +238,7 @@ export const useBoatStore = create<BoatStore>()(
       applySignalKDelta: (delta) =>
         set((state) => {
           const timestamp = new Date().toISOString();
-          const data = applyBoatDataPatch(state.data, mapSignalKDelta(delta));
+          const data = withAnchorDrift(applyBoatDataPatch(state.data, mapSignalKDelta(delta)));
           const sourceHealth = {
             ...state.sourceHealth,
             signalk: {
@@ -315,10 +332,6 @@ export const useBoatStore = create<BoatStore>()(
               distanceNm: drift(state.data.route.distanceNm, 0.12, 0.1, 24),
               etaMinutes: Math.max(2, Math.round(drift(state.data.route.etaMinutes, 1.8, 2, 240))),
               crossTrackErrorNm: drift(state.data.route.crossTrackErrorNm, 0.01, 0, 0.45),
-            },
-            time: {
-              ...state.data.time,
-              local: currentLocalTime(),
             },
           };
           const sourceHealth = {

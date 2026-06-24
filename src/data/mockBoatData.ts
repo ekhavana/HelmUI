@@ -13,6 +13,8 @@ export const mockBoatData = {
     cogTrue: 45,
     gpsFix: '3D',
     satellites: 12,
+    latitude: null as number | null,
+    longitude: null as number | null,
   },
   wind: {
     awaDeg: 135,
@@ -69,6 +71,8 @@ export const mockBoatData = {
     radiusMeters: 24,
     distanceFromSetMeters: 9.2,
     alarmArmed: true,
+    anchorLat: null as number | null,
+    anchorLon: null as number | null,
   },
   route: {
     nextWaypoint: 'Harbor Approach',

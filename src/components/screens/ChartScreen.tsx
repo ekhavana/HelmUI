@@ -1,14 +1,48 @@
-import { LocateFixed, Navigation, Ship, Triangle } from 'lucide-react';
-import { runtimeConfig } from '../../config/runtime';
+import L from 'leaflet';
+import { Navigation, Ship } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useBoatStore } from '../../store/boatStore';
 import { formatDegrees, formatKts, formatNumber } from '../../utils/formatters';
+import { useLeafletMap, vesselIcon } from '../../utils/useLeafletMap';
 import { Card } from '../ui/Card';
+
+const DEFAULT_LAT = 40.7128;
+const DEFAULT_LON = -74.006;
 
 export function ChartScreen() {
   const navigation = useBoatStore((state) => state.data.navigation);
   const speed = useBoatStore((state) => state.data.speed);
   const route = useBoatStore((state) => state.data.route);
   const ais = useBoatStore((state) => state.data.ais);
+
+  const { containerRef: mapContainerRef, mapRef } = useLeafletMap({ zoom: 13, zoomControl: true });
+  const markerRef = useRef<L.Marker | null>(null);
+
+  const lat = navigation.latitude ?? DEFAULT_LAT;
+  const lon = navigation.longitude ?? DEFAULT_LON;
+  const hasPosition = navigation.latitude !== null && navigation.longitude !== null;
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const icon = vesselIcon(navigation.headingTrue);
+    if (markerRef.current) {
+      markerRef.current.setIcon(icon);
+      markerRef.current.setLatLng([lat, lon]);
+    } else {
+      markerRef.current = L.marker([lat, lon], { icon }).addTo(map);
+    }
+
+    if (hasPosition) {
+      map.setView([lat, lon], map.getZoom(), { animate: true });
+    }
+
+    return () => {
+      markerRef.current?.remove();
+      markerRef.current = null;
+    };
+  }, [lat, lon, navigation.headingTrue, hasPosition]);
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[320px_minmax(0,1fr)_360px] gap-4">
@@ -37,31 +71,21 @@ export function ChartScreen() {
         </Card>
       </aside>
 
-      <Card className="relative overflow-hidden rounded-[2rem]" tone="active">
-        <div className="absolute inset-0 opacity-35" style={{ backgroundImage: `url(${runtimeConfig.chart.tileUrlTemplate})`, backgroundPosition: 'center', backgroundSize: 'cover' }} />
-        <div className="absolute inset-0 opacity-30">
-          <div className="h-full w-full bg-[linear-gradient(rgba(34,211,238,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.14)_1px,transparent_1px)] bg-[size:52px_52px]" />
-        </div>
-        <svg className="relative h-full w-full" viewBox="0 0 1000 700" role="img" aria-label="chart view">
-          <path d="M60 620 C260 480 330 560 470 450 C610 340 690 420 920 250" fill="none" stroke="rgba(34,211,238,0.5)" strokeDasharray="12 10" strokeWidth="8" />
-          <circle cx="470" cy="450" fill="rgba(34,211,238,0.25)" r="28" stroke="rgba(34,211,238,0.9)" strokeWidth="4" />
-          <circle cx="780" cy="320" fill="rgba(248,113,113,0.25)" r="26" stroke="rgba(248,113,113,0.85)" strokeWidth="4" />
-          <circle cx="700" cy="525" fill="rgba(250,204,21,0.25)" r="22" stroke="rgba(250,204,21,0.85)" strokeWidth="4" />
-          <g transform={`translate(470 450) rotate(${navigation.headingTrue})`}>
-            <polygon fill="rgba(34,211,238,0.95)" points="0,-44 24,28 0,16 -24,28" />
-          </g>
-        </svg>
-        <div className="pointer-events-none absolute left-6 top-6 flex items-center gap-3 rounded-2xl border border-cyan-300/30 bg-slate-950/65 px-4 py-2 text-cyan-100">
-          <LocateFixed className="h-6 w-6" />
-          <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-slate-400">Live Chart</div>
-            <div className="text-base font-semibold">AIS + Route Overlay</div>
+      <div className="relative min-h-0 overflow-hidden rounded-[2rem] border border-cyan-300/20">
+        <div ref={mapContainerRef} className="absolute inset-0" />
+        {!hasPosition && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <div className="rounded-2xl border border-cyan-300/30 bg-slate-950/80 px-6 py-3 text-sm font-semibold text-cyan-200">
+              Waiting for GPS fix…
+            </div>
           </div>
+        )}
+        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-cyan-100">
+          <div className="text-xs uppercase tracking-widest text-slate-400">Live Chart</div>
+          <span className="text-slate-500">·</span>
+          <div className="text-sm font-semibold">OSM + OpenSeaMap</div>
         </div>
-        <div className="pointer-events-none absolute right-6 top-6 rounded-xl border border-cyan-300/30 bg-slate-950/70 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-cyan-100">
-          {runtimeConfig.chart.offlineOnly ? 'Offline Tiles' : 'Hybrid Tiles'}
-        </div>
-      </Card>
+      </div>
 
       <aside className="flex min-h-0 flex-col gap-4">
         <Card title="AIS Contacts" eyebrow="Traffic" tone={ais.riskLevel === 'danger' ? 'danger' : ais.riskLevel === 'warning' ? 'warning' : 'safe'}>
@@ -77,8 +101,12 @@ export function ChartScreen() {
         <Card title="Guidance" eyebrow="Pilot">
           <div className="space-y-2 text-sm font-semibold text-slate-200">
             <div className="flex items-center gap-2"><Navigation className="h-4 w-4 text-cyan-200" /> Keep waypoint corridor centered</div>
-            <div className="flex items-center gap-2"><Triangle className="h-4 w-4 text-amber-200" /> Monitor crossing traffic starboard side</div>
-            <div className="flex items-center gap-2"><Triangle className="h-4 w-4 text-cyan-200" /> Current heading aligns with route plan</div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-amber-300">▲</span> Monitor crossing traffic starboard side
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-cyan-300">▲</span> Current heading aligns with route plan
+            </div>
           </div>
         </Card>
       </aside>

@@ -8,7 +8,7 @@ Type=simple
 User=pi
 WorkingDirectory=/opt/helmui
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/npm run preview
+ExecStart=/usr/bin/env npm run preview
 Restart=always
 RestartSec=3
 

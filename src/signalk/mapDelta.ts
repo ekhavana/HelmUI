@@ -11,6 +11,7 @@ type BoatDataPatch = Partial<{
   bilge: Partial<BoatData['bilge']>;
   engine: Partial<BoatData['engine']>;
   environment: Partial<BoatData['environment']>;
+  route: Partial<BoatData['route']>;
 }>;
 
 function numeric(value: unknown): number | null {
@@ -56,12 +57,22 @@ function mapValue(update: SignalKValueUpdate): BoatDataPatch {
       return numberValue === null ? {} : { battery: { houseVoltage: numberValue } };
     case 'electrical.batteries.house.current':
       return numberValue === null ? {} : { battery: { currentAmps: numberValue } };
+    case 'electrical.batteries.house.capacity.stateOfCharge':
+      return numberValue === null ? {} : { battery: { housePercent: Math.round(numberValue * 100) } };
     case 'environment.inside.bilge.floodDetected': {
       const alarm = bool(value);
       return alarm === null ? {} : { bilge: { alarm, message: alarm ? 'Water Detected' : 'No Water Detected' } };
     }
     case 'propulsion.main.coolantTemperature':
       return numberValue === null ? {} : { engine: { coolantTempC: kelvinToCelsius(numberValue) } };
+    case 'propulsion.main.revolutions':
+      return numberValue === null ? {} : { engine: { rpm: Math.round(numberValue * 60) } };
+    case 'propulsion.main.oilPressure':
+      return numberValue === null ? {} : { engine: { oilPressurePsi: numberValue * 0.000145038 } };
+    case 'propulsion.main.fuel.rate':
+      return numberValue === null ? {} : { engine: { fuelRateLph: numberValue * 3600 } };
+    case 'propulsion.main.runTime':
+      return numberValue === null ? {} : { engine: { hours: numberValue / 3600 } };
     case 'electrical.alternators.0.voltage':
       return numberValue === null ? {} : { engine: { alternatorVoltage: numberValue } };
     case 'navigation.gnss.methodQuality': {
@@ -70,6 +81,24 @@ function mapValue(update: SignalKValueUpdate): BoatDataPatch {
     }
     case 'navigation.gnss.satellites':
       return numberValue === null ? {} : { navigation: { satellites: Math.round(numberValue) } };
+    case 'environment.water.temperature':
+      return numberValue === null ? {} : { environment: { waterTempC: kelvinToCelsius(numberValue) } };
+    case 'navigation.courseRhumbline.nextPoint.distance':
+      return numberValue === null ? {} : { route: { distanceNm: numberValue / 1852 } };
+    case 'navigation.courseRhumbline.crossTrackError':
+      return numberValue === null ? {} : { route: { crossTrackErrorNm: Math.abs(numberValue) / 1852 } };
+    case 'navigation.courseRhumbline.nextPoint.name': {
+      const name = text(value);
+      return name === null ? {} : { route: { nextWaypoint: name } };
+    }
+    case 'navigation.position': {
+      if (value && typeof value === 'object' && 'latitude' in value && 'longitude' in value) {
+        const lat = numeric((value as Record<string, unknown>).latitude);
+        const lon = numeric((value as Record<string, unknown>).longitude);
+        if (lat !== null && lon !== null) return { navigation: { latitude: lat, longitude: lon } };
+      }
+      return {};
+    }
     default:
       return {};
   }
@@ -98,5 +127,6 @@ export function applyBoatDataPatch(data: BoatData, patch: BoatDataPatch): BoatDa
     bilge: { ...data.bilge, ...patch.bilge },
     engine: { ...data.engine, ...patch.engine },
     environment: { ...data.environment, ...patch.environment },
+    route: { ...data.route, ...patch.route },
   };
 }

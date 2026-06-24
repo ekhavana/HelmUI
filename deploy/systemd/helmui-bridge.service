@@ -8,7 +8,7 @@ Type=simple
 User=pi
 WorkingDirectory=/opt/helmui
 EnvironmentFile=/etc/default/helmui-bridge
-ExecStart=/usr/bin/npm run bridge
+ExecStart=/usr/bin/env npm run bridge
 Restart=always
 RestartSec=3
 

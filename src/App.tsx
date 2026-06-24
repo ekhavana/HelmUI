@@ -27,6 +27,7 @@ export default function App() {
   useEffect(() => {
     if (runtimeConfig.profile !== 'development-sim') return;
     if (runtimeConfig.telemetry.requireLiveData) return;
+    if (runtimeConfig.signalK.enabled) return;
 
     const interval = window.setInterval(tickSimulation, 1000);
 

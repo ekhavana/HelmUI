@@ -1,0 +1,38 @@
+[2026-06-24T10:11:58.813Z] INFO  [SkillInstaller] Wrote SKILL.md (version 0.99.3) to /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.claude/skills/jolli-recall/SKILL.md
+[2026-06-24T10:11:58.813Z] INFO  [SkillInstaller] Wrote SKILL.md (version 0.99.3) to /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.claude/skills/jolli-search/SKILL.md
+[2026-06-24T10:11:58.814Z] INFO  [SkillInstaller] Wrote SKILL.md (version 0.99.3) to /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.agents/skills/jolli-recall/SKILL.md
+[2026-06-24T10:11:58.814Z] INFO  [SkillInstaller] Wrote SKILL.md (version 0.99.3) to /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.agents/skills/jolli-search/SKILL.md
+[2026-06-24T10:11:58.912Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-24T10:11:59.350Z] INFO  [Installer] Status: enabled=false, claude=false, git=false, geminiHook=false, worktreeHooks=false, sessions=1, summaries=0, codex=true/true, gemini=true/true, enabledWorktrees=0, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-24T10:12:04.273Z] INFO  [GitExclude] Updated /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.git/info/exclude with 5 Jolli skill exclude paths
+[2026-06-24T10:12:04.274Z] INFO  [McpRegistration] Registered MCP server in /Users/evgenykhavana/Desktop/Programming Projects/HelmUI/.mcp.json
+[2026-06-24T10:12:04.276Z] INFO  [GitHookInstaller] Git post-commit hook installed
+[2026-06-24T10:12:04.278Z] INFO  [GitHookInstaller] Git post-rewrite hook installed
+[2026-06-24T10:12:04.279Z] INFO  [GitHookInstaller] Git prepare-commit-msg hook installed
+[2026-06-24T10:12:04.279Z] INFO  [GitHookInstaller] Git post-merge hook installed
+[2026-06-24T10:12:04.280Z] INFO  [GeminiHookInstaller] Gemini AfterAgent hook installed
+[2026-06-24T10:12:04.280Z] INFO  [Installer] Skipping v5 migration on vscode-extension source — Extension.ts owns it with UI
+[2026-06-24T10:12:04.280Z] INFO  [Installer] Installation complete
+[2026-06-24T10:12:04.280Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-24T10:12:05.754Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=1, summaries=0, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-24T10:12:05.754Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-24T10:12:05.841Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=1, summaries=0, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-24T10:12:06.518Z] INFO  [bridge] Merged mode activated {"branch":"main","creationPoint":"214adbe3","author":"Evgeny Khavana"}
+[2026-06-24T10:26:24.651Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-24T10:26:32.731Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-24T10:51:41.163Z] INFO  [initialLoad] All panels loaded — updating status bar
+[2026-06-24T10:51:41.163Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-24T10:52:09.242Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-24T10:52:09.242Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-24T10:52:09.242Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-24T10:52:09.242Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-24T10:52:19.704Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=1, summaries=0, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-24T10:52:19.720Z] INFO  [SidebarWebviewProvider] pushMemories: 0 item(s)
+[2026-06-24T10:52:24.597Z] INFO  [SidebarWebviewProvider] pushCommits: 0 item(s), mode=empty
+[2026-06-24T10:52:24.756Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=1, summaries=0, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-24T10:52:24.781Z] WARN  [ReadStorageResolver] createReadStorage: folder lacks index.json — falling back to orphan branch (migration incomplete, or folder wiped)
+[2026-06-24T10:52:24.853Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 342 new bubbles, 8 entries extracted (index 0→342)
+[2026-06-24T10:52:24.853Z] WARN  [SummaryStore] loadIndex: index.json unreadable from Wr (fresh repo or backend read failed)
+[2026-06-24T10:52:24.859Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 342 new bubbles, 8 entries extracted (index 0→342)
+[2026-06-24T10:52:24.869Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-24T10:52:24.870Z] INFO  [SidebarWebviewProvider] pushMemories: 0 item(s)

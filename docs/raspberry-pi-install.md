@@ -68,6 +68,12 @@ If this fails, stop and resolve before moving to services.
 
 ## 6) Configure production environment
 
+Two transport options are available. Choose one.
+
+### Option A — Bridge (recommended for MQTT + Signal K combined)
+
+The bridge process connects to both Signal K and MQTT, normalises the data, and streams it to the UI over a local WebSocket. Requires the `helmui-bridge` service (sections 7–8).
+
 Create `.env.production` in repo root:
 
 ```bash
@@ -76,13 +82,27 @@ VITE_RUNTIME_PROFILE=production-live
 VITE_TELEMETRY_TRANSPORT=bridge
 VITE_TELEMETRY_BRIDGE_WS_URL=ws://127.0.0.1:4300/ws
 VITE_TELEMETRY_BRIDGE_HTTP_URL=http://127.0.0.1:4300
-VITE_CHART_OFFLINE_ONLY=true
-VITE_CHART_TILE_URL_TEMPLATE=/tiles/base.svg
 VITE_AI_ASSISTANT_ENABLED=false
 EOF
 ```
 
+### Option B — Direct Signal K (no bridge, no MQTT)
+
+The UI connects directly to Signal K. No bridge service needed. Only Signal K paths are available (no MQTT status topics).
+
+```bash
+cat > /opt/helmui/.env.production <<'EOF'
+VITE_RUNTIME_PROFILE=staging-live
+VITE_TELEMETRY_TRANSPORT=signalk
+VITE_AI_ASSISTANT_ENABLED=false
+EOF
+```
+
+The Signal K WebSocket URL is auto-detected from the browser's hostname at runtime (e.g. `ws://<pi-hostname>:3000/signalk/v1/stream`). No URL variable required.
+
 ## 7) Configure bridge service environment
+
+> Skip this section if using **Option B** (direct Signal K) from section 6.
 
 Create bridge env file:
 
@@ -96,6 +116,16 @@ EOF
 ```
 
 Adjust hosts/ports/topic names for your vessel network.
+
+Signal K paths subscribed by the bridge (and direct client):
+
+- `navigation.position`, `navigation.headingTrue`, `navigation.speedOverGround`, `navigation.speedThroughWater`
+- `navigation.courseOverGroundTrue`, `navigation.gnss.methodQuality`, `navigation.gnss.satellites`
+- `navigation.courseRhumbline.nextPoint.distance/name`, `navigation.courseRhumbline.crossTrackError`
+- `environment.depth.belowTransducer`, `environment.wind.*`, `environment.water.temperature`
+- `electrical.batteries.house.voltage/current/capacity.stateOfCharge`
+- `propulsion.main.coolantTemperature/revolutions/oilPressure/fuel.rate/runTime`
+- `electrical.alternators.0.voltage`, `environment.inside.bilge.floodDetected`
 
 ## 8) Create systemd service: HelmUI bridge
 
@@ -131,7 +161,7 @@ Type=simple
 User=pi
 WorkingDirectory=/opt/helmui
 EnvironmentFile=/etc/default/helmui-bridge
-ExecStart=/usr/bin/npm run bridge
+ExecStart=/usr/bin/env npm run bridge
 Restart=always
 RestartSec=3
 
@@ -171,7 +201,7 @@ Type=simple
 User=pi
 WorkingDirectory=/opt/helmui
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/npm run preview
+ExecStart=/usr/bin/env npm run preview
 Restart=always
 RestartSec=3
 
@@ -216,13 +246,17 @@ If your image does not use LXDE, configure equivalent autostart in your composit
 
 Before real operation:
 
-1. `helmui-bridge` service is active.
-2. `/health` reports all required sources up.
+1. `helmui-bridge` service is active (skip if using direct Signal K).
+2. `/health` reports all required sources up (bridge mode only).
 3. `helmui-web` service is active and reachable.
 4. Status bar in HelmUI does not show source `down`.
-5. AI Assistant input is disabled (production policy).
-6. Chart layer loads local tile background.
-7. Alarms are visible when forcing test conditions.
+5. Chart map renders with vessel marker at correct GPS position.
+6. Anchor screen shows GPS fix — "Set Anchor" button becomes enabled.
+7. Engine screen shows live RPM and coolant temperature.
+8. Battery percent updates (requires `stateOfCharge` from your BMS via Signal K).
+9. AI Assistant input is disabled (production policy).
+10. Alarms are visible when forcing test conditions.
+11. Sunset countdown in status bar updates from GPS position.
 
 ## 12) Logs and diagnostics
 
@@ -274,10 +308,22 @@ This stops/disables services and removes:
 - White screen:
   - Check `helmui-web` status and logs.
   - Confirm preview endpoint responds.
-- No live telemetry:
-  - Check `helmui-bridge` status.
+- No live telemetry (bridge mode):
+  - Check `helmui-bridge` status and logs.
   - Validate Signal K URL and MQTT URL in `/etc/default/helmui-bridge`.
   - Verify `/sources` reports expected `connected` states.
+- No live telemetry (direct Signal K mode):
+  - Confirm Signal K is running: `curl http://127.0.0.1:3000/signalk`.
+  - Check browser console for WebSocket connection errors.
+- No GPS position / map blank:
+  - Confirm `navigation.position` is published by your GPS source in Signal K admin UI.
+  - Check Signal K Data Browser at `http://<pi>:3000` for live `navigation.position` values.
+- Anchor watch drift always zero:
+  - Anchor set point must be captured first (tap "Set Anchor" in Anchor screen when GPS fix is active).
+- Engine data missing:
+  - Confirm your engine interface (NMEA 2000 / NMEA 0183 / CAN) is publishing `propulsion.main.*` in Signal K.
+- Battery % missing:
+  - Requires a BMS or shunt that publishes `electrical.batteries.house.capacity.stateOfCharge` to Signal K.
 - Kiosk not opening:
   - Ensure Chromium package exists (`chromium-browser` or `chromium`).
   - Test script manually from shell first.
