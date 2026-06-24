@@ -36,3 +36,39 @@
 [2026-06-24T10:52:24.859Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 342 new bubbles, 8 entries extracted (index 0→342)
 [2026-06-24T10:52:24.869Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
 [2026-06-24T10:52:24.870Z] INFO  [SidebarWebviewProvider] pushMemories: 0 item(s)
+[2026-06-24T11:46:11.074Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-06-24T11:46:11.091Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-06-24T11:46:11.407Z] INFO  [PostCommitHook] Detected operation: commit
+[2026-06-24T11:46:11.416Z] INFO  [PostCommitHook] Enqueued: type=commit hash=c8905009
+[2026-06-24T11:46:11.416Z] INFO  [QueueWorker] Launching background worker
+[2026-06-24T11:46:11.417Z] INFO  [QueueWorker] Background worker spawned (PID: 77472)
+[2026-06-24T11:46:11.537Z] INFO  [QueueWorker] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.3 cliVer=0.99.3 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal/dist
+[2026-06-24T11:46:11.548Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-24T11:46:11.567Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-24T11:46:11.574Z] INFO  [QueueWorker] Processing queue entry: type=commit hash=c8905009
+[2026-06-24T11:46:11.587Z] INFO  [GitOps] Commit c8905009: Add Signal K path mappings for position, battery SOC, engine
+[2026-06-24T11:46:11.587Z] INFO  [QueueWorker] Commit: c8905009 - Add Signal K path mappings for position, battery SOC, engine metrics, water temp, and route data; update systemd services to use /usr/bin/env npm; expand Raspberry Pi install docs with direct Signal K transport option and enhanced troubleshooting (11ms)
+[2026-06-24T11:46:13.723Z] INFO  [QueueWorker] Discovered 1 Cursor session(s)
+[2026-06-24T11:46:13.737Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 342 new bubbles, 8 entries extracted (index 0→342)
+[2026-06-24T11:46:13.737Z] INFO  [QueueWorker] Transcript source: session=acd0477c-362e-4d61-9b04-57f8f9e9dd53, lines=0→342, entries=8
+[2026-06-24T11:46:13.806Z] WARN  [GitOps] Diff failed, trying diff of HEAD against empty tree
+[2026-06-24T11:46:14.218Z] WARN  [GitOps] Diff exceeds 150000-char budget (10485444 chars) — prepending --stat file list and truncating body
+[2026-06-24T11:46:14.333Z] INFO  [QueueWorker] Git diff: 254 files changed, +66630 -12956 (596ms)
+[2026-06-24T11:46:14.384Z] INFO  [QueueWorker] Prompt blocks: plans=0 notes=0 references=0
+[2026-06-24T11:46:14.384Z] INFO  [Summarizer] Generating summary for commit c8905009
+[2026-06-24T11:46:14.384Z] INFO  [Summarizer] Context: transcript=8, files=254, lines=66630+12956
+[2026-06-24T11:46:14.384Z] WARN  [QueueWorker] First API attempt failed: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).. Retrying in 2000ms...
+[2026-06-24T11:46:16.387Z] INFO  [Summarizer] Generating summary for commit c8905009
+[2026-06-24T11:46:16.387Z] INFO  [Summarizer] Context: transcript=8, files=254, lines=66630+12956
+[2026-06-24T11:46:16.387Z] ERROR [QueueWorker] API call failed after retry: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).
+[2026-06-24T11:46:16.387Z] WARN  [QueueWorker] Saving summary with empty topics + summaryError marker for commit c8905009
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] API summary generated (2.0s)
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Plan registry scan: found 0 uncommitted slug(s) on main: []
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Plan association: detected 0 slug(s) from transcripts: []
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Note registry scan: found 0 uncommitted note(s) on main: []
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Note association: detected 0 note(s): []
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Reference association: detected 0 ref(s) for branch main
+[2026-06-24T11:46:16.387Z] INFO  [QueueWorker] Summary built for c8905009: recap=no, topics=0, plans=absent, notes=absent, references=absent
+[2026-06-24T11:46:16.397Z] WARN  [SummaryStore] loadIndex: index.json unreadable from $d (fresh repo or backend read failed)
+[2026-06-24T11:46:16.410Z] INFO  [GitOps] Creating orphan branch 'jollimemory/summaries/v3' using plumbing commands
+[2026-06-24T11:46:16.428Z] INFO  [GitOps] Orphan branch 'jollimemory/summaries/v3' created successfully
