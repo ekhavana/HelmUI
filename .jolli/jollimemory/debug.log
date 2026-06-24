@@ -187,3 +187,50 @@
 [2026-06-24T11:46:33.258Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
 [2026-06-24T11:46:33.259Z] INFO  [SidebarWebviewProvider] pushMemories: 3 item(s)
 [2026-06-24T11:46:33.362Z] INFO  [SidebarWebviewProvider] pushCommits: 3 item(s), mode=multi
+[2026-06-24T11:46:37.191Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-06-24T11:46:37.199Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-06-24T11:46:37.305Z] INFO  [PostCommitHook] Detected operation: commit
+[2026-06-24T11:46:37.313Z] INFO  [PostCommitHook] Enqueued: type=commit hash=33c4bcb7
+[2026-06-24T11:46:37.313Z] INFO  [QueueWorker] Launching background worker
+[2026-06-24T11:46:37.313Z] INFO  [QueueWorker] Background worker spawned (PID: 78089)
+[2026-06-24T11:46:37.413Z] INFO  [QueueWorker] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.3 cliVer=0.99.3 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal/dist
+[2026-06-24T11:46:37.417Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-24T11:46:37.430Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-24T11:46:37.431Z] INFO  [QueueWorker] Processing queue entry: type=commit hash=33c4bcb7
+[2026-06-24T11:46:37.440Z] INFO  [GitOps] Commit 33c4bcb7: Update Jolli cursor timestamp and process commit b8d40916 qu
+[2026-06-24T11:46:37.440Z] INFO  [QueueWorker] Commit: 33c4bcb7 - Update Jolli cursor timestamp and process commit b8d40916 queue entry with LLM provider error handling (8ms)
+[2026-06-24T11:46:37.503Z] INFO  [QueueWorker] Discovered 1 Cursor session(s)
+[2026-06-24T11:46:37.506Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 0 new bubbles, 0 entries extracted (index 342→342)
+[2026-06-24T11:46:37.522Z] INFO  [QueueWorker] Git diff: 2 files changed, +48 -1 (15ms)
+[2026-06-24T11:46:37.523Z] INFO  [QueueWorker] Prompt blocks: plans=0 notes=0 references=0
+[2026-06-24T11:46:37.523Z] INFO  [Summarizer] Generating summary for commit 33c4bcb7
+[2026-06-24T11:46:37.523Z] INFO  [Summarizer] Context: transcript=0, files=2, lines=48+1
+[2026-06-24T11:46:37.523Z] WARN  [QueueWorker] First API attempt failed: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).. Retrying in 2000ms...
+[2026-06-24T11:46:39.526Z] INFO  [Summarizer] Generating summary for commit 33c4bcb7
+[2026-06-24T11:46:39.526Z] INFO  [Summarizer] Context: transcript=0, files=2, lines=48+1
+[2026-06-24T11:46:39.526Z] ERROR [QueueWorker] API call failed after retry: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).
+[2026-06-24T11:46:39.526Z] WARN  [QueueWorker] Saving summary with empty topics + summaryError marker for commit 33c4bcb7
+[2026-06-24T11:46:39.527Z] INFO  [QueueWorker] API summary generated (2.0s)
+[2026-06-24T11:46:39.527Z] INFO  [QueueWorker] Plan registry scan: found 0 uncommitted slug(s) on main: []
+[2026-06-24T11:46:39.527Z] INFO  [QueueWorker] Plan association: detected 0 slug(s) from transcripts: []
+[2026-06-24T11:46:39.528Z] INFO  [QueueWorker] Note registry scan: found 0 uncommitted note(s) on main: []
+[2026-06-24T11:46:39.528Z] INFO  [QueueWorker] Note association: detected 0 note(s): []
+[2026-06-24T11:46:39.528Z] INFO  [QueueWorker] Reference association: detected 0 ref(s) for branch main
+[2026-06-24T11:46:39.528Z] INFO  [QueueWorker] Summary built for 33c4bcb7: recap=no, topics=0, plans=absent, notes=absent, references=absent
+[2026-06-24T11:46:39.603Z] INFO  [GitOps] Updated branch 'jollimemory/summaries/v3': 3 written, 0 deleted (via fast-import)
+[2026-06-24T11:46:39.616Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-b-33c4bcb7.md (commit)
+[2026-06-24T11:46:39.616Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-b-33c4bcb7.md
+[2026-06-24T11:46:39.616Z] INFO  [FolderStorage] Wrote 3 files, deleted 0 (Add summary for 33c4bcb7: Update Jolli cursor timestamp and process commit b)
+[2026-06-24T11:46:39.616Z] INFO  [SummaryStore] Summary stored successfully for commit 33c4bcb7
+[2026-06-24T11:46:39.617Z] INFO  [QueueWorker] Summary stored successfully for commit 33c4bcb7 (88ms, 0 plans, 0 notes, 0 references)
+[2026-06-24T11:46:39.617Z] INFO  [QueueWorker] === Pipeline completed in 2.2s ===
+[2026-06-24T11:46:39.617Z] INFO  [QueueWorker] === Summary content (0 topics) ===
+[2026-06-24T11:46:39.622Z] INFO  [QueueWorker] Processed 1 queue entries
+[2026-06-24T11:46:39.623Z] INFO  [QueueWorker] === Queue worker finished ===
+[2026-06-24T11:46:39.821Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-24T11:46:39.821Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-24T11:46:39.821Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-24T11:46:39.921Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-24T11:46:39.921Z] INFO  [SidebarWebviewProvider] pushMemories: 4 item(s)
+[2026-06-24T11:46:39.923Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 0 new bubbles, 0 entries extracted (index 342→342)
+[2026-06-24T11:46:40.018Z] INFO  [SidebarWebviewProvider] pushCommits: 4 item(s), mode=multi
