@@ -1,0 +1,35 @@
+{
+	"version": 5,
+	"commitHash": "c89050095ad777cfc4eb6ba66ae6ad537cfe92fb",
+	"commitMessage": "Add Signal K path mappings for position, battery SOC, engine metrics, water temp, and route data; update systemd services to use /usr/bin/env npm; expand Raspberry Pi install docs with direct Signal K transport option and enhanced troubleshooting",
+	"commitAuthor": "Evgeny Khavana",
+	"commitDate": "2026-06-24T11:46:10.000Z",
+	"branch": "main",
+	"generatedAt": "2026-06-24T11:46:16.387Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 8,
+	"conversationTurns": 4,
+	"llm": {
+		"model": "unknown",
+		"inputTokens": 0,
+		"outputTokens": 0,
+		"apiLatencyMs": 0,
+		"stopReason": "error"
+	},
+	"stats": {
+		"filesChanged": 254,
+		"insertions": 66630,
+		"deletions": 12956
+	},
+	"topics": [],
+	"diffStats": {
+		"filesChanged": 254,
+		"insertions": 66630,
+		"deletions": 12956
+	},
+	"summaryError": "llm-failed",
+	"transcripts": [
+		"dc00f70c-297d-413d-a25f-00e19f36563d"
+	]
+}

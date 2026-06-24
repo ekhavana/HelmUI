@@ -1,4 +1,21 @@
 {
-	"version": 1,
-	"entries": []
+	"version": 3,
+	"entries": [
+		{
+			"commitHash": "c89050095ad777cfc4eb6ba66ae6ad537cfe92fb",
+			"parentCommitHash": null,
+			"treeHash": "624c6e4ec3694063e0d1f655acb60385fc674045",
+			"commitType": "commit",
+			"commitMessage": "Add Signal K path mappings for position, battery SOC, engine metrics, water temp, and route data; update systemd services to use /usr/bin/env npm; expand Raspberry Pi install docs with direct Signal K transport option and enhanced troubleshooting",
+			"commitDate": "2026-06-24T11:46:10.000Z",
+			"branch": "main",
+			"generatedAt": "2026-06-24T11:46:16.387Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 254,
+				"insertions": 66630,
+				"deletions": 12956
+			}
+		}
+	]
 }
