@@ -1,0 +1,33 @@
+{
+	"version": 5,
+	"commitHash": "0d7659ffff3538cafac5309a5074d977c8234bf6",
+	"commitMessage": "Update Jolli cursor timestamp and process commit 91652e87 queue entry with LLM provider error handling",
+	"commitAuthor": "Evgeny Khavana",
+	"commitDate": "2026-06-28T13:27:39.000Z",
+	"branch": "main",
+	"generatedAt": "2026-06-28T13:27:58.915Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "unknown",
+		"inputTokens": 0,
+		"outputTokens": 0,
+		"apiLatencyMs": 0,
+		"stopReason": "error"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 50,
+		"deletions": 1
+	},
+	"topics": [],
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 50,
+		"deletions": 1
+	},
+	"summaryError": "llm-failed",
+	"transcripts": []
+}
