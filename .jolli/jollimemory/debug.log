@@ -848,3 +848,13 @@
 [2026-08-06T19:30:46.178Z] INFO  [StopHook] Stop hook triggered (session=840320e6-f602-4bbc-be7f-c4e55fe3f66c)
 [2026-08-06T19:30:46.179Z] INFO  [StopHook] Hook input — session_id=840320e6-f602-4bbc-be7f-c4e55fe3f66c, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/840320e6-f602-4bbc-be7f-c4e55fe3f66c/840320e6-f602-4bbc-be7f-c4e55fe3f66c.jsonl
 [2026-08-06T19:30:46.180Z] INFO  [StopHook] Claude Code integration disabled — skipping session tracking
+[2026-08-06T19:31:21.543Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-08-06T19:31:21.578Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-08-06T19:31:21.723Z] INFO  [PostCommitHook] [trace=ce2ba7006ac9c4390e7786d06c69e9e0] Detected operation: commit
+[2026-08-06T19:31:21.732Z] INFO  [PostCommitHook] [trace=ce2ba7006ac9c4390e7786d06c69e9e0] Enqueued: type=commit hash=2e5ad44c
+[2026-08-06T19:31:21.732Z] INFO  [QueueWorker] [trace=ce2ba7006ac9c4390e7786d06c69e9e0] Launching background worker
+[2026-08-06T19:31:21.732Z] INFO  [QueueWorker] [trace=ce2ba7006ac9c4390e7786d06c69e9e0] Background worker spawned (PID: 76513)
+[2026-08-06T19:31:21.817Z] INFO  [QueueWorker] [trace=ce2ba7006ac9c4390e7786d06c69e9e0] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.6 cliVer=0.99.6 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.6-universal/dist
+[2026-08-06T19:31:34.945Z] INFO  [StopHook] Stop hook triggered (session=840320e6-f602-4bbc-be7f-c4e55fe3f66c)
+[2026-08-06T19:31:34.946Z] INFO  [StopHook] Hook input — session_id=840320e6-f602-4bbc-be7f-c4e55fe3f66c, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/840320e6-f602-4bbc-be7f-c4e55fe3f66c/840320e6-f602-4bbc-be7f-c4e55fe3f66c.jsonl
+[2026-08-06T19:31:34.946Z] INFO  [StopHook] Claude Code integration disabled — skipping session tracking
