@@ -805,3 +805,46 @@
 [2026-08-06T19:30:19.414Z] INFO  [StopHook] Stop hook triggered (session=840320e6-f602-4bbc-be7f-c4e55fe3f66c)
 [2026-08-06T19:30:19.414Z] INFO  [StopHook] Hook input — session_id=840320e6-f602-4bbc-be7f-c4e55fe3f66c, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/840320e6-f602-4bbc-be7f-c4e55fe3f66c/840320e6-f602-4bbc-be7f-c4e55fe3f66c.jsonl
 [2026-08-06T19:30:19.415Z] INFO  [StopHook] Claude Code integration disabled — skipping session tracking
+[2026-08-06T19:30:35.278Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-08-06T19:30:35.297Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-08-06T19:30:35.472Z] INFO  [PostCommitHook] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Detected operation: commit
+[2026-08-06T19:30:35.480Z] INFO  [PostCommitHook] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Enqueued: type=commit hash=9bda5e15
+[2026-08-06T19:30:35.480Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Launching background worker
+[2026-08-06T19:30:35.480Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Background worker spawned (PID: 76128)
+[2026-08-06T19:30:35.568Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.6 cliVer=0.99.6 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.6-universal/dist
+[2026-08-06T19:30:35.570Z] INFO  [StorageFactory] [trace=e85f8494c6fdd6aa410de4fcb982db1f] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-08-06T19:30:35.579Z] INFO  [StorageFactory] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-08-06T19:30:35.579Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Processing queue entry: type=commit hash=9bda5e15
+[2026-08-06T19:30:35.586Z] INFO  [GitOps] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Commit 9bda5e15: Update Jolli debug log for commit e759a8ec processing.
+[2026-08-06T19:30:35.586Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Commit: 9bda5e15 - Update Jolli debug log for commit e759a8ec processing. (6ms)
+[2026-08-06T19:30:35.587Z] INFO  [SessionTracker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Pruning stale session edfb28b9-e574-4cab-ad3f-d105698b26c0 (age: 807h)
+[2026-08-06T19:30:35.587Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] No active sessions found — will infer topics from diff if available
+[2026-08-06T19:30:35.598Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Git diff: 1 files changed, +43 -0 (11ms)
+[2026-08-06T19:30:35.599Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Prompt blocks: plans=0 notes=0 references=0
+[2026-08-06T19:30:35.599Z] INFO  [Summarizer] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Generating summary for commit 9bda5e15
+[2026-08-06T19:30:35.599Z] INFO  [Summarizer] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Context: transcript=0, files=1, lines=43+0
+[2026-08-06T19:30:35.599Z] WARN  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] First API attempt failed: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).. Retrying in 2000ms...
+[2026-08-06T19:30:37.600Z] INFO  [Summarizer] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Generating summary for commit 9bda5e15
+[2026-08-06T19:30:37.600Z] INFO  [Summarizer] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Context: transcript=0, files=1, lines=43+0
+[2026-08-06T19:30:37.600Z] ERROR [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] API call failed after retry: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).
+[2026-08-06T19:30:37.600Z] WARN  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Saving summary with empty topics + summaryError marker for commit 9bda5e15
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] API summary generated (2.0s)
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Plan registry scan: found 0 uncommitted slug(s) on main: []
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Plan association: detected 0 slug(s) from transcripts: []
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Note registry scan: found 0 uncommitted note(s) on main: []
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Note association: detected 0 note(s): []
+[2026-08-06T19:30:37.601Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Reference association: detected 0 ref(s) for branch main
+[2026-08-06T19:30:37.602Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Summary built for 9bda5e15: recap=no, topics=0, plans=absent, notes=absent, references=absent
+[2026-08-06T19:30:37.658Z] INFO  [GitOps] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Updated branch 'jollimemory/summaries/v3': 3 written, 0 deleted (via fast-import)
+[2026-08-06T19:30:37.670Z] INFO  [MetadataManager] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Manifest updated: main/update-jolli-debug-log-for-commit-e759a8ec-process-9bda5e15.md (commit)
+[2026-08-06T19:30:37.670Z] INFO  [FolderStorage] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Markdown generated: main/update-jolli-debug-log-for-commit-e759a8ec-process-9bda5e15.md
+[2026-08-06T19:30:37.670Z] INFO  [FolderStorage] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Wrote 3 files, deleted 0 (Add summary for 9bda5e15: Update Jolli debug log for commit e759a8ec process)
+[2026-08-06T19:30:37.670Z] INFO  [SummaryStore] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Summary stored successfully for commit 9bda5e15
+[2026-08-06T19:30:37.670Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Summary stored successfully for commit 9bda5e15 (68ms, 0 plans, 0 notes, 0 references)
+[2026-08-06T19:30:37.670Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] === Pipeline completed in 2.1s ===
+[2026-08-06T19:30:37.670Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] === Summary content (0 topics) ===
+[2026-08-06T19:30:37.676Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] Processed 1 queue entries
+[2026-08-06T19:30:37.677Z] INFO  [QueueWorker] [trace=e85f8494c6fdd6aa410de4fcb982db1f] === Queue worker finished ===
+[2026-08-06T19:30:46.178Z] INFO  [StopHook] Stop hook triggered (session=840320e6-f602-4bbc-be7f-c4e55fe3f66c)
+[2026-08-06T19:30:46.179Z] INFO  [StopHook] Hook input — session_id=840320e6-f602-4bbc-be7f-c4e55fe3f66c, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/840320e6-f602-4bbc-be7f-c4e55fe3f66c/840320e6-f602-4bbc-be7f-c4e55fe3f66c.jsonl
+[2026-08-06T19:30:46.180Z] INFO  [StopHook] Claude Code integration disabled — skipping session tracking
