@@ -234,13 +234,42 @@ cd /opt/helmui
 
 To auto-launch on boot for desktop sessions:
 
+> IMPORTANT: The autostart file must keep the normal desktop components
+> (`lxpanel` and `pcmanfm --desktop`) **in addition to** the kiosk line. If the
+> file contains only the kiosk entry, the LXDE panel and desktop wallpaper never
+> start — so when Chromium exits you are left with a **black screen instead of
+> the desktop**. Always launch the kiosk *on top of* a running desktop.
+
 ```bash
 mkdir -p ~/.config/lxsession/LXDE-pi
-grep -q "start-kiosk.sh" ~/.config/lxsession/LXDE-pi/autostart 2>/dev/null || \
-  echo "@/opt/helmui/scripts/start-kiosk.sh http://127.0.0.1:4173" >> ~/.config/lxsession/LXDE-pi/autostart
+cat > ~/.config/lxsession/LXDE-pi/autostart <<'EOF'
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+@/opt/helmui/scripts/start-kiosk.sh http://127.0.0.1:4173
+EOF
 ```
 
-If your image does not use LXDE, configure equivalent autostart in your compositor/session manager.
+With this ordering the desktop (panel + wallpaper) is always running underneath,
+so stopping/exiting the kiosk drops you back to the desktop instead of a black
+screen.
+
+If your image does not use LXDE, configure equivalent autostart in your
+compositor/session manager. On Raspberry Pi OS Bookworm (Wayland/labwc or
+wayfire) add the kiosk to `~/.config/wayfire.ini` under `[autostart]` instead,
+and do **not** disable the default panel/background entries.
+
+### Returning to the desktop (exit kiosk)
+
+Stop the kiosk at any time and return to the desktop with:
+
+```bash
+/opt/helmui/scripts/stop-kiosk.sh
+```
+
+This removes the kiosk autostart entry, kills the running Chromium kiosk, and
+restarts the LXDE session so the desktop reappears. See section 17 for full
+emergency recovery over SSH/TTY.
 
 ## 11) Pre-departure production checks
 
@@ -327,6 +356,60 @@ This stops/disables services and removes:
 - Kiosk not opening:
   - Ensure Chromium package exists (`chromium-browser` or `chromium`).
   - Test script manually from shell first.
+- Black screen after kiosk stops (no desktop):
+  - The kiosk autostart entry replaced the desktop autostart entries. Restore
+    the full autostart file from section 10 so `lxpanel` and
+    `pcmanfm --desktop` run alongside the kiosk.
+  - For immediate recovery, see section 17.
+
+## 17) Emergency recovery: get the desktop back now
+
+The kiosk is **not** a systemd service — it is Chromium launched from the LXDE
+autostart file (`~/.config/lxsession/LXDE-pi/autostart`). So there is no
+`systemctl stop` for the kiosk itself; you stop the browser and restart the
+graphical session.
+
+Connect over SSH, or on the Pi press `Ctrl+Alt+F2` to open a text console (TTY)
+and log in, then run:
+
+```bash
+# 1) Stop the kiosk autostart from relaunching this session / on next boot
+sed -i '/start-kiosk.sh/d' ~/.config/lxsession/LXDE-pi/autostart 2>/dev/null || true
+# (Bookworm / Wayland users, also run:)
+sed -i '/start-kiosk.sh/d' ~/.config/wayfire.ini 2>/dev/null || true
+
+# 2) Kill the kiosk launcher and Chromium
+pkill -f start-kiosk.sh 2>/dev/null || true
+pkill -f chromium 2>/dev/null || true
+pkill -f chromium-browser 2>/dev/null || true
+
+# 3) Bring the desktop back by restarting the display manager
+#    (Raspberry Pi OS desktop uses LightDM; the generic alias also works)
+sudo systemctl restart display-manager 2>/dev/null \
+  || sudo systemctl restart lightdm
+```
+
+If the screen is still black (the graphical session is not running at all):
+
+```bash
+# Make sure the machine is set to boot to the graphical desktop and start it now
+sudo systemctl set-default graphical.target
+sudo systemctl start display-manager 2>/dev/null || sudo systemctl start lightdm
+sudo systemctl isolate graphical.target
+```
+
+Notes:
+
+- Stopping `helmui-web`/`helmui-bridge` does **not** affect the display — those
+  services only serve the app and telemetry, they do not own the screen.
+- If you removed the kiosk line in step 1, it will not relaunch on the next
+  reboot. To re-enable the kiosk later, restore the autostart file from
+  section 10.
+- The convenience script does steps 1–3 for you:
+
+```bash
+/opt/helmui/scripts/stop-kiosk.sh
+```
 
 ## 16) Security and safety notes
 
