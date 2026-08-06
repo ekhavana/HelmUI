@@ -442,3 +442,237 @@
 [2026-06-24T11:58:54.452Z] INFO  [SidebarWebviewProvider] pushMemories: 8 item(s)
 [2026-06-24T11:58:54.459Z] INFO  [CursorTranscriptReader] Read Cursor session acd0477c: 0 new bubbles, 0 entries extracted (index 342→342)
 [2026-06-24T11:58:54.569Z] INFO  [SidebarWebviewProvider] pushCommits: 8 item(s), mode=multi
+[2026-06-28T13:27:44.511Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-06-28T13:27:45.900Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-06-28T13:27:48.630Z] INFO  [PostCommitHook] Detected operation: commit
+[2026-06-28T13:27:48.637Z] INFO  [PostCommitHook] Enqueued: type=commit hash=0d7659ff
+[2026-06-28T13:27:48.637Z] INFO  [QueueWorker] Launching background worker
+[2026-06-28T13:27:48.638Z] INFO  [QueueWorker] Background worker spawned (PID: 85302)
+[2026-06-28T13:27:48.729Z] INFO  [QueueWorker] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.3 cliVer=0.99.3 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal/dist
+[2026-06-28T13:27:48.732Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-28T13:27:51.015Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-28T13:27:51.018Z] INFO  [QueueWorker] Processing queue entry: type=commit hash=0d7659ff
+[2026-06-28T13:27:51.041Z] INFO  [GitOps] Commit 0d7659ff: Update Jolli cursor timestamp and process commit 91652e87 qu
+[2026-06-28T13:27:51.041Z] INFO  [QueueWorker] Commit: 0d7659ff - Update Jolli cursor timestamp and process commit 91652e87 queue entry with LLM provider error handling (18ms)
+[2026-06-28T13:27:54.506Z] INFO  [QueueWorker] No active sessions found — will infer topics from diff if available
+[2026-06-28T13:27:56.907Z] INFO  [QueueWorker] Git diff: 2 files changed, +50 -1 (2.4s)
+[2026-06-28T13:27:56.908Z] INFO  [QueueWorker] Prompt blocks: plans=0 notes=0 references=0
+[2026-06-28T13:27:56.908Z] INFO  [Summarizer] Generating summary for commit 0d7659ff
+[2026-06-28T13:27:56.908Z] INFO  [Summarizer] Context: transcript=0, files=2, lines=50+1
+[2026-06-28T13:27:56.908Z] WARN  [QueueWorker] First API attempt failed: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).. Retrying in 2000ms...
+[2026-06-28T13:27:58.911Z] INFO  [Summarizer] Generating summary for commit 0d7659ff
+[2026-06-28T13:27:58.911Z] INFO  [Summarizer] Context: transcript=0, files=2, lines=50+1
+[2026-06-28T13:27:58.911Z] ERROR [QueueWorker] API call failed after retry: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).
+[2026-06-28T13:27:58.912Z] WARN  [QueueWorker] Saving summary with empty topics + summaryError marker for commit 0d7659ff
+[2026-06-28T13:27:58.913Z] INFO  [QueueWorker] API summary generated (2.0s)
+[2026-06-28T13:27:58.914Z] INFO  [QueueWorker] Plan registry scan: found 0 uncommitted slug(s) on main: []
+[2026-06-28T13:27:58.914Z] INFO  [QueueWorker] Plan association: detected 0 slug(s) from transcripts: []
+[2026-06-28T13:27:58.914Z] INFO  [QueueWorker] Note registry scan: found 0 uncommitted note(s) on main: []
+[2026-06-28T13:27:58.914Z] INFO  [QueueWorker] Note association: detected 0 note(s): []
+[2026-06-28T13:27:58.915Z] INFO  [QueueWorker] Reference association: detected 0 ref(s) for branch main
+[2026-06-28T13:27:58.915Z] INFO  [QueueWorker] Summary built for 0d7659ff: recap=no, topics=0, plans=absent, notes=absent, references=absent
+[2026-06-28T13:28:06.275Z] INFO  [GitOps] Updated branch 'jollimemory/summaries/v3': 3 written, 0 deleted (via fast-import)
+[2026-06-28T13:28:09.135Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-9-0d7659ff.md (commit)
+[2026-06-28T13:28:09.135Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-9-0d7659ff.md
+[2026-06-28T13:28:09.135Z] INFO  [FolderStorage] Wrote 3 files, deleted 0 (Add summary for 0d7659ff: Update Jolli cursor timestamp and process commit 9)
+[2026-06-28T13:28:09.135Z] INFO  [SummaryStore] Summary stored successfully for commit 0d7659ff
+[2026-06-28T13:28:09.136Z] INFO  [QueueWorker] Summary stored successfully for commit 0d7659ff (10.2s, 0 plans, 0 notes, 0 references)
+[2026-06-28T13:28:09.136Z] INFO  [QueueWorker] === Pipeline completed in 18.1s ===
+[2026-06-28T13:28:09.136Z] INFO  [QueueWorker] === Summary content (0 topics) ===
+[2026-06-28T13:28:09.142Z] INFO  [QueueWorker] Processed 1 queue entries
+[2026-06-28T13:28:11.058Z] INFO  [SessionTracker] Enqueued queue operation: type=ingest tag=ingest file=1782653291057-00000001-69a955b6-ingest.json
+[2026-06-28T13:28:11.059Z] INFO  [QueueWorker] === Queue worker finished ===
+[2026-06-28T13:28:11.059Z] INFO  [QueueWorker] Queue has 1 remaining entries — spawning chain worker
+[2026-06-28T13:28:11.059Z] INFO  [QueueWorker] Launching background worker
+[2026-06-28T13:28:11.060Z] INFO  [QueueWorker] Background worker spawned (PID: 85497)
+[2026-06-28T13:28:11.151Z] INFO  [QueueWorker] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.3 cliVer=0.99.3 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal/dist
+[2026-06-28T13:28:11.155Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-28T13:28:11.166Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-28T13:28:11.167Z] INFO  [QueueWorker] Processing queue entry: type=ingest triggeredBy=post-commit
+[2026-06-28T13:28:11.167Z] INFO  [QueueWorker] No API key configured — skipping ingest (post-commit)
+[2026-06-28T13:28:11.249Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-28T13:28:11.249Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-28T13:28:11.249Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-28T13:28:12.797Z] INFO  [QueueWorker] Processed 1 queue entries
+[2026-06-28T13:28:12.798Z] INFO  [QueueWorker] === Queue worker finished ===
+[2026-06-28T13:28:13.178Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-28T13:28:13.179Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-28T13:28:13.179Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-28T13:28:15.104Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-28T13:28:15.133Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-28T13:28:15.197Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-28T13:28:15.198Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-28T13:28:16.267Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-06-28T13:28:16.289Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-06-28T13:31:30.589Z] INFO  [activate] Activating JolliMemory extension {"workspaceRoot":"/Users/evgenykhavana/Desktop/Programming Projects/HelmUI","extensionPath":"/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal"}
+[2026-06-28T13:31:30.631Z] INFO  [initialLoad] Loading all panels
+[2026-06-28T13:31:34.545Z] ERROR [activate] Failed to refresh hook paths {"errno":-4,"code":"EINTR","syscall":"read"}
+[2026-06-28T13:31:34.602Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-28T13:31:34.602Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-28T13:31:34.602Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-28T13:31:39.008Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-28T13:31:39.028Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-28T13:31:39.029Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-28T13:32:30.612Z] WARN  [activate] kbInitPromise watchdog fired after 60s — releasing sync gate; check initializeKB() for hangs
+[2026-06-28T13:32:49.365Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-28T13:32:49.389Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-28T13:32:49.403Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-28T13:32:49.431Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-28T13:32:50.890Z] INFO  [SchemaV5Migration] Found 9 summary files to inspect
+[2026-06-28T13:32:51.062Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-28T13:32:51.062Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-28T13:32:51.062Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-28T13:32:51.062Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-28T13:32:53.670Z] INFO  [SchemaV5Migration] Reading 9 summaries...
+[2026-06-28T13:32:53.699Z] INFO  [Installer] Status: enabled=true, claude=false, git=true, geminiHook=true, worktreeHooks=false, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-28T13:32:55.840Z] INFO  [initialLoad] All panels loaded — updating status bar
+[2026-06-28T13:32:55.840Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-28T13:32:56.013Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-28T13:32:56.032Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-28T13:33:12.259Z] INFO  [SchemaV5Migration] Read 9 summaries in 18589 ms
+[2026-06-28T13:33:12.259Z] INFO  [SchemaV5Migration] Writing 9 summary file(s) via active storage...
+[2026-06-28T13:33:13.577Z] INFO  [GitOps] Updated branch 'jollimemory/summaries/v3': 9 written, 0 deleted (via fast-import)
+[2026-06-28T13:33:18.362Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-9-0d7659ff.md (commit)
+[2026-06-28T13:33:18.362Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-9-0d7659ff.md
+[2026-06-28T13:33:20.233Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-b-33c4bcb7.md (commit)
+[2026-06-28T13:33:20.233Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-b-33c4bcb7.md
+[2026-06-28T13:33:21.591Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-6-50074265.md (commit)
+[2026-06-28T13:33:21.591Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-6-50074265.md
+[2026-06-28T13:33:23.437Z] INFO  [MetadataManager] Manifest updated: main/add-jolli-debug-logs-for-commit-c8905009-processin-6b145fd1.md (commit)
+[2026-06-28T13:33:23.437Z] INFO  [FolderStorage] Markdown generated: main/add-jolli-debug-logs-for-commit-c8905009-processin-6b145fd1.md
+[2026-06-28T13:33:24.610Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-7-6e2b8f2c.md (commit)
+[2026-06-28T13:33:24.610Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-7-6e2b8f2c.md
+[2026-06-28T13:33:26.549Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-3-79f1c3fc.md (commit)
+[2026-06-28T13:33:26.549Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-3-79f1c3fc.md
+[2026-06-28T13:33:27.852Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-5-91652e87.md (commit)
+[2026-06-28T13:33:27.852Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-5-91652e87.md
+[2026-06-28T13:33:29.596Z] INFO  [MetadataManager] Manifest updated: main/update-jolli-cursor-timestamp-and-process-commit-6-b8d40916.md (commit)
+[2026-06-28T13:33:29.596Z] INFO  [FolderStorage] Markdown generated: main/update-jolli-cursor-timestamp-and-process-commit-6-b8d40916.md
+[2026-06-28T13:33:31.288Z] INFO  [MetadataManager] Manifest updated: main/add-signal-k-path-mappings-for-position-battery-so-c8905009.md (commit)
+[2026-06-28T13:33:31.288Z] INFO  [FolderStorage] Markdown generated: main/add-signal-k-path-mappings-for-position-battery-so-c8905009.md
+[2026-06-28T13:33:31.288Z] INFO  [FolderStorage] Wrote 9 files, deleted 0 (Schema v5 migration: re-pushing 9 v5 summaries to heal storage shadow)
+[2026-06-28T13:33:31.410Z] INFO  [GitOps] Updated branch 'jollimemory/summaries/v3': 1 written, 0 deleted (via fast-import)
+[2026-06-28T13:33:31.410Z] INFO  [FolderStorage] Wrote 1 files, deleted 0 (Schema v5 migration: re-pushing 9 v5 summaries to heal storage shadow)
+[2026-06-28T13:33:31.410Z] INFO  [SchemaV5Migration] Schema v5 migration complete: 0 migrated, 9 skipped, fresh=false, recovery=true (took 19151 ms)
+[2026-06-28T13:33:31.410Z] INFO  [SchemaV5Migration] Pre-migration orphan-branch SHA was 4ccc707c6ada9b7c7a158d54247f0a7c1dc93224 (debug-only recovery anchor)
+[2026-06-28T13:33:31.411Z] INFO  [activate] Schema v5 migration: alreadyDone=false fresh=false migrated=0 skipped=9
+[2026-06-28T13:33:31.441Z] INFO  [MigrationEngine] === Migration started ===
+[2026-06-28T13:33:34.002Z] INFO  [FolderStorage] Wrote 1 files, deleted 0 (Migration: copy index)
+[2026-06-28T13:33:34.003Z] INFO  [MigrationEngine] === Migration completed: 0 migrated, 9 skipped, 0 failed ===
+[2026-06-28T13:33:34.003Z] INFO  [MigrationEngine] === 0.99.2 head-regen (one-shot) started ===
+[2026-06-28T13:33:34.004Z] INFO  [MigrationEngine] Head regenerate: regenerated=9 skipped=0 failed=0
+[2026-06-28T13:33:34.005Z] INFO  [MigrationEngine] Stale-child sweep: deleted=0 failed=0
+[2026-06-28T13:33:34.006Z] INFO  [activate] KB auto-migration: completed (9/9)
+[2026-06-30T19:07:53.726Z] INFO  [SidebarWebviewProvider] pushMemories: 0 item(s)
+[2026-06-30T19:07:58.577Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-06-30T19:07:58.616Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-30T19:07:58.617Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-30T20:08:52.309Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-30T20:08:57.205Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-06-30T20:08:57.209Z] INFO  [cmd] signIn invoked
+[2026-06-30T20:08:57.214Z] INFO  [AuthService] Opening browser for sign-in
+[2026-06-30T20:10:35.998Z] INFO  [cmd] signIn invoked
+[2026-06-30T20:10:36.000Z] INFO  [AuthService] Opening browser for sign-in
+[2026-06-30T20:13:01.360Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-30T20:13:04.398Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-06-30T20:14:04.432Z] INFO  [activate] Activating JolliMemory extension {"workspaceRoot":"/Users/evgenykhavana/Desktop/Programming Projects/HelmUI","extensionPath":"/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.3-universal"}
+[2026-06-30T20:14:04.481Z] INFO  [initialLoad] Loading all panels
+[2026-06-30T20:14:05.901Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-30T20:14:05.936Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-30T20:14:05.936Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-30T20:14:05.937Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-30T20:14:05.950Z] INFO  [plans] detectPlans found 0 plans (0 in registry)
+[2026-06-30T20:14:05.950Z] INFO  [notes] detectNotes found 0 notes (0 in registry)
+[2026-06-30T20:14:05.950Z] INFO  [references] detectReferences(*) found 0 (0 in registry)
+[2026-06-30T20:14:29.731Z] INFO  [StorageFactory] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-06-30T20:14:39.654Z] INFO  [StorageFactory] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-06-30T20:14:49.170Z] INFO  [activate] Schema v5 migration already complete — skipping (no UI toggle)
+[2026-06-30T20:14:51.141Z] INFO  [MigrationEngine] 0.99.2 head-regen already completed at 2026-06-28T13:33:34.005Z — skipping phase 1
+[2026-06-30T20:14:54.015Z] INFO  [MigrationEngine] Stale-child sweep: deleted=0 failed=0
+[2026-06-30T20:14:54.015Z] INFO  [activate] KB stale-child reconcile: swept=0 completedAt=2026-06-28T13:33:34.005Z
+[2026-06-30T20:14:57.629Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-30T20:14:57.630Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-30T20:14:57.630Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-30T20:14:57.630Z] INFO  [initialLoad] All panels loaded — updating status bar
+[2026-06-30T20:14:57.631Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-30T20:15:00.080Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-30T20:15:00.086Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-30T20:15:00.088Z] INFO  [Installer] Checking Jolli Memory status
+[2026-06-30T20:15:00.234Z] INFO  [Installer] Status: enabled=true, claude=true, git=true, geminiHook=true, worktreeHooks=true, sessions=0, summaries=9, codex=true/true, gemini=true/true, enabledWorktrees=1, opencode=false/undefined, cursor=true/true, copilot=false/undefined, copilotChat=false
+[2026-06-30T20:27:53.852Z] INFO  [SidebarWebviewProvider] pushMemories: 0 item(s)
+[2026-06-30T20:27:57.935Z] WARN  [SummaryStore] loadIndex: index.json unreadable from t (fresh repo or backend read failed)
+[2026-06-30T20:27:57.936Z] INFO  [SidebarWebviewProvider] pushMemories: 9 item(s)
+[2026-06-30T20:28:02.138Z] INFO  [SidebarWebviewProvider] pushCommits: 1 item(s), mode=single
+[2026-07-04T03:59:54.917Z] INFO  [SessionStartHook] SessionStartHook invoked (cwd=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI)
+[2026-07-04T03:59:54.937Z] INFO  [SessionStartHook] No briefing generated (skipped or timed out)
+[2026-07-04T04:05:36.764Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:05:36.765Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:05:36.764Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:05:38.838Z] INFO  [StopHook] Session saved successfully
+[2026-07-04T04:05:36.765Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:05:38.840Z] INFO  [StopHook] Session saved successfully
+[2026-07-04T04:05:57.011Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:05:57.012Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:05:57.014Z] INFO  [StopHook] Session saved successfully
+[2026-07-04T04:06:58.723Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:06:58.724Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:06:58.727Z] INFO  [StopHook] Session saved successfully
+[2026-07-04T04:09:21.850Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:09:21.851Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:09:23.133Z] INFO  [StopHook] Session saved successfully
+[2026-07-04T04:11:34.606Z] INFO  [StopHook] Stop hook triggered (session=edfb28b9-e574-4cab-ad3f-d105698b26c0)
+[2026-07-04T04:11:34.606Z] INFO  [StopHook] Hook input — session_id=edfb28b9-e574-4cab-ad3f-d105698b26c0, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/edfb28b9-e574-4cab-ad3f-d105698b26c0/edfb28b9-e574-4cab-ad3f-d105698b26c0.jsonl
+[2026-07-04T04:11:34.608Z] INFO  [StopHook] Session saved successfully
+[2026-08-06T19:28:35.152Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook started (source: message) ===
+[2026-08-06T19:28:35.164Z] INFO  [PrepareMsgHook] === Prepare-commit-msg hook finished ===
+[2026-08-06T19:28:38.507Z] INFO  [PostCommitHook] [trace=5fbec6ea9e0aab12b7762bfac4954751] Detected operation: commit
+[2026-08-06T19:28:38.516Z] INFO  [PostCommitHook] [trace=5fbec6ea9e0aab12b7762bfac4954751] Enqueued: type=commit hash=856fb4d7
+[2026-08-06T19:28:38.516Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Launching background worker
+[2026-08-06T19:28:38.517Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Background worker spawned (PID: 74387)
+[2026-08-06T19:28:38.627Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.6 cliVer=0.99.6 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.6-universal/dist
+[2026-08-06T19:28:38.630Z] INFO  [StorageFactory] [trace=5fbec6ea9e0aab12b7762bfac4954751] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-08-06T19:28:39.821Z] INFO  [StorageFactory] [trace=5fbec6ea9e0aab12b7762bfac4954751] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-08-06T19:28:39.826Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Processing queue entry: type=commit hash=856fb4d7
+[2026-08-06T19:28:39.847Z] INFO  [GitOps] [trace=5fbec6ea9e0aab12b7762bfac4954751] Commit 856fb4d7: Document kiosk desktop recovery and add stop-kiosk helper.
+[2026-08-06T19:28:39.847Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Commit: 856fb4d7 - Document kiosk desktop recovery and add stop-kiosk helper. (15ms)
+[2026-08-06T19:28:39.848Z] INFO  [SessionTracker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Pruning stale session edfb28b9-e574-4cab-ad3f-d105698b26c0 (age: 807h)
+[2026-08-06T19:28:39.849Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] No active sessions found — will infer topics from diff if available
+[2026-08-06T19:28:39.868Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Git diff: 3 files changed, +141 -3 (19ms)
+[2026-08-06T19:28:39.869Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Prompt blocks: plans=0 notes=0 references=0
+[2026-08-06T19:28:39.869Z] INFO  [Summarizer] [trace=5fbec6ea9e0aab12b7762bfac4954751] Generating summary for commit 856fb4d7
+[2026-08-06T19:28:39.869Z] INFO  [Summarizer] [trace=5fbec6ea9e0aab12b7762bfac4954751] Context: transcript=0, files=3, lines=141+3
+[2026-08-06T19:28:39.869Z] WARN  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] First API attempt failed: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).. Retrying in 2000ms...
+[2026-08-06T19:28:41.871Z] INFO  [Summarizer] [trace=5fbec6ea9e0aab12b7762bfac4954751] Generating summary for commit 856fb4d7
+[2026-08-06T19:28:41.871Z] INFO  [Summarizer] [trace=5fbec6ea9e0aab12b7762bfac4954751] Context: transcript=0, files=3, lines=141+3
+[2026-08-06T19:28:41.871Z] ERROR [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] API call failed after retry: No LLM provider available. Set an Anthropic API key (ANTHROPIC_API_KEY) or configure a Jolli Space API key (jolliApiKey).
+[2026-08-06T19:28:41.871Z] WARN  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Saving summary with empty topics + summaryError marker for commit 856fb4d7
+[2026-08-06T19:28:41.871Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] API summary generated (2.0s)
+[2026-08-06T19:28:41.872Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Plan registry scan: found 0 uncommitted slug(s) on main: []
+[2026-08-06T19:28:41.872Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Plan association: detected 0 slug(s) from transcripts: []
+[2026-08-06T19:28:41.872Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Note registry scan: found 0 uncommitted note(s) on main: []
+[2026-08-06T19:28:41.872Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Note association: detected 0 note(s): []
+[2026-08-06T19:28:41.873Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Reference association: detected 0 ref(s) for branch main
+[2026-08-06T19:28:41.876Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Summary built for 856fb4d7: recap=no, topics=0, plans=absent, notes=absent, references=absent
+[2026-08-06T19:28:44.947Z] INFO  [StopHook] Stop hook triggered (session=840320e6-f602-4bbc-be7f-c4e55fe3f66c)
+[2026-08-06T19:28:44.947Z] INFO  [StopHook] Hook input — session_id=840320e6-f602-4bbc-be7f-c4e55fe3f66c, transcript_path=/Users/evgenykhavana/.cursor/projects/Users-evgenykhavana-Desktop-Programming-Projects-HelmUI/agent-transcripts/840320e6-f602-4bbc-be7f-c4e55fe3f66c/840320e6-f602-4bbc-be7f-c4e55fe3f66c.jsonl
+[2026-08-06T19:28:44.948Z] INFO  [StopHook] Claude Code integration disabled — skipping session tracking
+[2026-08-06T19:28:48.273Z] INFO  [GitOps] [trace=5fbec6ea9e0aab12b7762bfac4954751] Updated branch 'jollimemory/summaries/v3': 3 written, 0 deleted (via fast-import)
+[2026-08-06T19:28:50.484Z] INFO  [MetadataManager] [trace=5fbec6ea9e0aab12b7762bfac4954751] Manifest updated: main/document-kiosk-desktop-recovery-and-add-stop-kiosk-856fb4d7.md (commit)
+[2026-08-06T19:28:50.484Z] INFO  [FolderStorage] [trace=5fbec6ea9e0aab12b7762bfac4954751] Markdown generated: main/document-kiosk-desktop-recovery-and-add-stop-kiosk-856fb4d7.md
+[2026-08-06T19:28:50.487Z] INFO  [FolderStorage] [trace=5fbec6ea9e0aab12b7762bfac4954751] Wrote 3 files, deleted 0 (Add summary for 856fb4d7: Document kiosk desktop recovery and add stop-kiosk)
+[2026-08-06T19:28:50.487Z] INFO  [SummaryStore] [trace=5fbec6ea9e0aab12b7762bfac4954751] Summary stored successfully for commit 856fb4d7
+[2026-08-06T19:28:50.488Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Summary stored successfully for commit 856fb4d7 (8.6s, 0 plans, 0 notes, 0 references)
+[2026-08-06T19:28:50.488Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Pipeline completed in 10.7s ===
+[2026-08-06T19:28:50.488Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Summary content (0 topics) ===
+[2026-08-06T19:28:50.504Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Processed 1 queue entries
+[2026-08-06T19:28:50.507Z] INFO  [SessionTracker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Enqueued queue operation: type=ingest tag=ingest file=1786044530506-00000001-10d9d807-ingest.json
+[2026-08-06T19:28:50.509Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Queue worker finished ===
+[2026-08-06T19:28:50.509Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Queue has 1 remaining entries — spawning chain worker
+[2026-08-06T19:28:50.509Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Launching background worker
+[2026-08-06T19:28:50.510Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Background worker spawned (PID: 74661)
+[2026-08-06T19:28:50.644Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Queue worker started === node=25.8.0 kind=vscode-plugin source=devin pkgVer=0.99.6 cliVer=0.99.6 dist=/Users/evgenykhavana/.devin/extensions/jolli.jollimemory-vscode-0.99.6-universal/dist
+[2026-08-06T19:28:50.646Z] INFO  [StorageFactory] [trace=5fbec6ea9e0aab12b7762bfac4954751] StorageFactory.create: storageMode=dual-write, projectPath=/Users/evgenykhavana/Desktop/Programming Projects/HelmUI
+[2026-08-06T19:28:50.656Z] INFO  [StorageFactory] [trace=5fbec6ea9e0aab12b7762bfac4954751] Storage mode: dual-write (primary=orphan, shadow=folder)
+[2026-08-06T19:28:50.658Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] Processing queue entry: type=ingest triggeredBy=post-commit
+[2026-08-06T19:28:50.659Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] No API key configured — skipping ingest (post-commit)
+[2026-08-06T19:28:50.660Z] INFO  [QueueWorker] [trace=5fbec6ea9e0aab12b7762bfac4954751] === Queue worker finished ===
