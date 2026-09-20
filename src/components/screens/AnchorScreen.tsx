@@ -31,7 +31,7 @@ export function AnchorScreen() {
     if (!map) return;
 
     if (hasVessel) {
-      const icon = vesselIcon(navigation.headingTrue, 32);
+      const icon = vesselIcon(navigation.headingTrue ?? 0, 32);
       if (vesselMarkerRef.current) {
         vesselMarkerRef.current.setLatLng([vesselLat!, vesselLon!]);
         vesselMarkerRef.current.setIcon(icon);
@@ -134,7 +134,7 @@ export function AnchorScreen() {
       </div>
 
       <aside className="flex min-h-0 flex-col gap-4">
-        <Card title="Watch Limits" eyebrow="Alarm" tone={anchor.distanceFromSetMeters > anchor.radiusMeters * 0.8 ? 'warning' : 'safe'}>
+        <Card title="Watch Limits" eyebrow="Alarm" tone={anchor.distanceFromSetMeters != null && anchor.distanceFromSetMeters > anchor.radiusMeters * 0.8 ? 'warning' : anchor.distanceFromSetMeters == null ? 'default' : 'safe'}>
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm uppercase tracking-[0.18em] text-slate-400">Radius</div>
@@ -146,9 +146,9 @@ export function AnchorScreen() {
         </Card>
         <Card title="Recommendations" eyebrow="Safety">
           <ul className="space-y-2 text-sm font-semibold text-slate-200">
-            <li>Confirm GPS lock before sleep cycle.</li>
-            <li>Set high-wind alarm at 22 kt.</li>
+            <li>Confirm GPS lock before leaving the helm unattended.</li>
             <li>Re-check bearings if drift exceeds 75% of radius.</li>
+            <li>Weigh and reset if the watch alarm fires.</li>
           </ul>
         </Card>
       </aside>

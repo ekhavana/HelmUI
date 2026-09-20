@@ -76,6 +76,9 @@ The bridge process connects to both Signal K and MQTT, normalises the data, and 
 
 Create `.env.production` in repo root:
 
+> Tip: `.env.production.example` in the repo root contains the full production
+> variable set — copy it and adjust hosts/ports: `cp .env.production.example .env.production`
+
 ```bash
 cat > /opt/helmui/.env.production <<'EOF'
 VITE_RUNTIME_PROFILE=production-live
@@ -123,6 +126,7 @@ Signal K paths subscribed by the bridge (and direct client):
 - `navigation.courseOverGroundTrue`, `navigation.gnss.methodQuality`, `navigation.gnss.satellites`
 - `navigation.courseRhumbline.nextPoint.distance/name`, `navigation.courseRhumbline.crossTrackError`
 - `environment.depth.belowTransducer`, `environment.wind.*`, `environment.water.temperature`
+- `steering.autopilot.mode`, `steering.autopilot.target.headingTrue`
 - `electrical.batteries.house.voltage/current/capacity.stateOfCharge`
 - `propulsion.main.coolantTemperature/revolutions/oilPressure/fuel.rate/runTime`
 - `electrical.alternators.0.voltage`, `environment.inside.bilge.floodDetected`

@@ -1,13 +1,11 @@
 import L from 'leaflet';
 import { Navigation, Ship } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useBoatStore } from '../../store/boatStore';
-import { formatDegrees, formatKts, formatNumber } from '../../utils/formatters';
+import { formatCardinal, formatDegrees, formatKts, formatNumber } from '../../utils/formatters';
+import { useAisMarkers } from '../../utils/useAisMarkers';
 import { useLeafletMap, vesselIcon } from '../../utils/useLeafletMap';
 import { Card } from '../ui/Card';
-
-const DEFAULT_LAT = 40.7128;
-const DEFAULT_LON = -74.006;
 
 export function ChartScreen() {
   const navigation = useBoatStore((state) => state.data.navigation);
@@ -17,16 +15,30 @@ export function ChartScreen() {
 
   const { containerRef: mapContainerRef, mapRef } = useLeafletMap({ zoom: 13, zoomControl: true });
   const markerRef = useRef<L.Marker | null>(null);
+  useAisMarkers(mapRef, ais.contacts);
 
-  const lat = navigation.latitude ?? DEFAULT_LAT;
-  const lon = navigation.longitude ?? DEFAULT_LON;
-  const hasPosition = navigation.latitude !== null && navigation.longitude !== null;
+  const lat = navigation.latitude;
+  const lon = navigation.longitude;
+  const hasPosition = lat !== null && lon !== null;
+  const contacts = useMemo(
+    () =>
+      Object.values(ais.contacts)
+        .filter((contact) => contact.latitude !== null && contact.longitude !== null)
+        .sort((a, b) => (a.rangeNm ?? Number.POSITIVE_INFINITY) - (b.rangeNm ?? Number.POSITIVE_INFINITY)),
+    [ais.contacts],
+  );
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    const icon = vesselIcon(navigation.headingTrue);
+    if (!hasPosition) {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      return;
+    }
+
+    const icon = vesselIcon(navigation.headingTrue ?? 0);
     if (markerRef.current) {
       markerRef.current.setIcon(icon);
       markerRef.current.setLatLng([lat, lon]);
@@ -34,15 +46,13 @@ export function ChartScreen() {
       markerRef.current = L.marker([lat, lon], { icon }).addTo(map);
     }
 
-    if (hasPosition) {
-      map.setView([lat, lon], map.getZoom(), { animate: true });
-    }
+    map.setView([lat, lon], map.getZoom(), { animate: true });
 
     return () => {
       markerRef.current?.remove();
       markerRef.current = null;
     };
-  }, [lat, lon, navigation.headingTrue, hasPosition]);
+  }, [lat, lon, navigation.headingTrue, hasPosition, mapRef]);
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[320px_minmax(0,1fr)_360px] gap-4">
@@ -56,7 +66,7 @@ export function ChartScreen() {
             </div>
             <div>
               <div className="text-slate-400">ETA</div>
-              <div className="text-xl text-white">{route.etaMinutes} min</div>
+              <div className="text-xl text-white">{formatNumber(route.etaMinutes, 0)} min</div>
             </div>
           </div>
           <div className="mt-3 text-sm font-semibold text-cyan-100">XTE {formatNumber(route.crossTrackErrorNm, 2)} nm</div>
@@ -96,17 +106,45 @@ export function ChartScreen() {
             </div>
             <Ship className="h-12 w-12 text-cyan-200/85" />
           </div>
-          <div className="mt-3 text-sm font-semibold text-slate-200">Closest {formatNumber(ais.closestNm)} nm · {ais.bearing}</div>
+          <div className="mt-3 text-sm font-semibold text-slate-200">
+            Closest {formatNumber(ais.closestNm)} nm · {ais.bearing}
+            {ais.closestName ? ` · ${ais.closestName}` : ''}
+          </div>
+          <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-auto">
+            {contacts.length === 0 ? (
+              <div className="text-sm font-semibold text-slate-400">Waiting for AIS targets…</div>
+            ) : (
+              contacts.slice(0, 8).map((contact) => (
+                <div key={contact.id} className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-3 py-2 text-sm font-semibold text-slate-200">
+                  <div className="flex items-center justify-between gap-2 text-white">
+                    <span className="truncate">{contact.name ?? contact.mmsi}</span>
+                    <span>{formatNumber(contact.rangeNm)} nm</span>
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    {formatCardinal(contact.bearingDeg)} · {formatKts(contact.sogKts)}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </Card>
         <Card title="Guidance" eyebrow="Pilot">
           <div className="space-y-2 text-sm font-semibold text-slate-200">
-            <div className="flex items-center gap-2"><Navigation className="h-4 w-4 text-cyan-200" /> Keep waypoint corridor centered</div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-amber-300">▲</span> Monitor crossing traffic starboard side
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-cyan-300">▲</span> Current heading aligns with route plan
-            </div>
+            {route.crossTrackErrorNm != null ? (
+              <div className="flex items-center gap-2"><Navigation className="h-4 w-4 text-cyan-200" /> XTE {formatNumber(route.crossTrackErrorNm, 2)} nm</div>
+            ) : (
+              <div className="flex items-center gap-2"><Navigation className="h-4 w-4 text-cyan-200" /> Waiting for route corridor</div>
+            )}
+            {ais.closestNm != null ? (
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-bold ${ais.riskLevel === 'danger' ? 'text-red-300' : ais.riskLevel === 'warning' ? 'text-amber-300' : 'text-cyan-300'}`}>▲</span>
+                Closest contact {formatNumber(ais.closestNm)} nm {ais.bearing}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500">▲</span> No AIS contacts yet
+              </div>
+            )}
           </div>
         </Card>
       </aside>

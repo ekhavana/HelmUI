@@ -1,8 +1,9 @@
-export type RuntimeProfile = 'development-sim' | 'staging-live' | 'production-live';
+import type { BridgeSourceName } from '../bridge/types';
+
+export type RuntimeProfile = 'staging-live' | 'production-live';
 
 const profile = (import.meta.env.VITE_RUNTIME_PROFILE as RuntimeProfile | undefined) ?? 'staging-live';
-
-const isProductionLike = profile === 'production-live' || profile === 'staging-live';
+const isProductionLive = profile === 'production-live';
 
 function resolveSignalKUrl(): string {
   if (import.meta.env.VITE_SIGNALK_WS_URL) return import.meta.env.VITE_SIGNALK_WS_URL as string;
@@ -13,13 +14,19 @@ function resolveSignalKUrl(): string {
 const signalKEnabledEnv = import.meta.env.VITE_SIGNALK_ENABLED;
 const signalKEnabled = signalKEnabledEnv !== undefined ? signalKEnabledEnv === 'true' : true;
 
+const telemetryTransport = (import.meta.env.VITE_TELEMETRY_TRANSPORT ?? 'signalk') as 'signalk' | 'bridge';
+const aiEnabledEnv = import.meta.env.VITE_AI_ASSISTANT_ENABLED;
+
 export const runtimeConfig = {
   profile,
   telemetry: {
-    transport: (import.meta.env.VITE_TELEMETRY_TRANSPORT ?? 'signalk') as 'signalk' | 'bridge',
+    transport: telemetryTransport,
     bridgeWsUrl: import.meta.env.VITE_TELEMETRY_BRIDGE_WS_URL ?? 'ws://localhost:4300/ws',
     bridgeHttpUrl: import.meta.env.VITE_TELEMETRY_BRIDGE_HTTP_URL ?? 'http://localhost:4300',
-    requireLiveData: import.meta.env.VITE_REQUIRE_LIVE_DATA === 'true' || isProductionLike,
+    requireLiveData: import.meta.env.VITE_REQUIRE_LIVE_DATA !== 'false',
+    activeSources: (telemetryTransport === 'bridge'
+      ? ['signalk', 'mqtt', 'nodered']
+      : ['signalk']) as BridgeSourceName[],
   },
   signalK: {
     enabled: signalKEnabled,
@@ -30,9 +37,6 @@ export const runtimeConfig = {
     offlineOnly: import.meta.env.VITE_CHART_OFFLINE_ONLY === 'true',
   },
   ai: {
-    enabled:
-      (import.meta.env.VITE_AI_ASSISTANT_ENABLED
-        ? import.meta.env.VITE_AI_ASSISTANT_ENABLED === 'true'
-        : profile !== 'production-live') && profile !== 'production-live',
+    enabled: !isProductionLive && aiEnabledEnv !== 'false',
   },
 };

@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, resolve, sep } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -8,10 +8,12 @@ import mqtt from 'mqtt';
 import { defaultSourceState, normalizeSignalKDelta } from './normalize.mjs';
 
 const PORT = Number(process.env.BRIDGE_PORT ?? 4300);
+const HOST = process.env.BRIDGE_HOST ?? '0.0.0.0';
 const SIGNALK_WS_URL = process.env.BRIDGE_SIGNALK_WS_URL ?? 'ws://localhost:3000/signalk/v1/stream?subscribe=none';
 const MQTT_URL = process.env.BRIDGE_MQTT_URL ?? 'mqtt://localhost:1883';
 const MQTT_STATUS_TOPIC = process.env.BRIDGE_MQTT_STATUS_TOPIC ?? 'helmui/bridge/nodered/status';
 const __dirname = resolve(fileURLToPath(new URL('.', import.meta.url)));
+const TILES_ROOT = resolve(join(__dirname, 'tiles'));
 
 const sourceState = defaultSourceState();
 const lastPatch = {};
@@ -26,8 +28,12 @@ function markSource(name, connected, detail = '') {
 
 const server = createServer((req, res) => {
   if (req.url.startsWith('/tiles/')) {
-    const fileName = req.url.replace('/tiles/', '');
-    const filePath = join(__dirname, 'tiles', fileName);
+    const fileName = req.url.slice('/tiles/'.length).split('?')[0];
+    const filePath = resolve(TILES_ROOT, fileName);
+    if (!filePath.startsWith(TILES_ROOT + sep)) {
+      res.writeHead(403).end();
+      return;
+    }
     readFile(filePath)
       .then((content) => {
         res.writeHead(200, { 'content-type': fileName.endsWith('.svg') ? 'image/svg+xml' : 'application/octet-stream' });
@@ -85,17 +91,37 @@ function emitDelta(patch) {
   broadcast({ type: 'delta', timestamp: new Date().toISOString(), patch, sources: sourceState });
 }
 
+const AIS_SUBSCRIBE_PATHS = [
+  'navigation.position',
+  'navigation.speedOverGround',
+  'navigation.courseOverGroundTrue',
+  'navigation.headingTrue',
+  'name',
+  'mmsi',
+];
+
 function setupSignalK() {
   const ws = new WebSocket(SIGNALK_WS_URL);
+  let selfContext = 'vessels.self';
   ws.on('open', () => {
     markSource('signalk', true, 'connected');
     ws.send(JSON.stringify({ context: 'vessels.self', subscribe: [{ path: '*', policy: 'instant' }] }));
+    ws.send(
+      JSON.stringify({
+        context: 'vessels.*',
+        subscribe: AIS_SUBSCRIBE_PATHS.map((path) => ({ path, policy: 'instant', minPeriod: 1000 })),
+      }),
+    );
     emitHealth();
   });
   ws.on('message', (buffer) => {
     try {
       const delta = JSON.parse(buffer.toString());
-      const patch = normalizeSignalKDelta(delta);
+      if (typeof delta.self === 'string' && !delta.updates) {
+        selfContext = delta.self;
+        return;
+      }
+      const patch = normalizeSignalKDelta(delta, { selfContext });
       if (Object.keys(patch).length > 0) {
         markSource('signalk', true, 'streaming');
         emitDelta(patch);
@@ -152,8 +178,8 @@ wss.on('connection', (socket) => {
   );
 });
 
-server.listen(PORT, () => {
-  console.log(`HelmUI bridge listening on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`HelmUI bridge listening on http://${HOST}:${PORT}`);
   setupSignalK();
   setupMqtt();
 });

@@ -1,11 +1,11 @@
 interface GaugeProps {
-  value: number;
+  value: number | null;
   max?: number;
   tone?: 'cyan' | 'green' | 'amber' | 'red';
 }
 
 export function Gauge({ value, max = 100, tone = 'cyan' }: GaugeProps) {
-  const percent = Math.max(0, Math.min(100, (value / max) * 100));
+  const percent = value == null ? 0 : Math.max(0, Math.min(100, (value / max) * 100));
   const color = tone === 'green' ? 'bg-safety-safe' : tone === 'amber' ? 'bg-safety-warning' : tone === 'red' ? 'bg-safety-danger' : 'bg-safety-active';
 
   return (

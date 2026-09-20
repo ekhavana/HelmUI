@@ -1,4 +1,4 @@
-import type { BoatData } from '../data/mockBoatData';
+import type { BoatData } from '../data/boatData';
 
 export type BridgeSourceName = 'signalk' | 'mqtt' | 'nodered';
 

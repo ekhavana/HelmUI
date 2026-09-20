@@ -5,9 +5,24 @@ export const depthThresholdsFt = {
   dangerBelow: 6,
 };
 
-export function getDepthSafetyState(depthFt: number): SafetyState {
-  if (depthFt < depthThresholdsFt.dangerBelow) return 'danger';
-  if (depthFt <= depthThresholdsFt.warningBelow) return 'warning';
+export const batteryThresholds = {
+  dangerPercent: 20,
+  dangerVoltage: 12.0,
+  warningPercent: 45,
+  warningVoltage: 12.4,
+};
+
+export const engineThresholds = {
+  coolantWarningC: 82,
+  coolantDangerC: 90,
+  oilWarningPsi: 40,
+  oilDangerPsi: 30,
+};
+
+export function getDepthSafetyState(depthFt: number, warningBelowFt: number = depthThresholdsFt.warningBelow): SafetyState {
+  const dangerBelowFt = Math.max(2, warningBelowFt - 3);
+  if (depthFt < dangerBelowFt) return 'danger';
+  if (depthFt <= warningBelowFt) return 'warning';
   return 'safe';
 }
 
@@ -19,8 +34,8 @@ export function getAisSafetyState(closestNm: number, targets: number): SafetySta
 }
 
 export function getBatterySafetyState(percent: number, voltage: number): SafetyState {
-  if (percent < 20 || voltage < 12) return 'danger';
-  if (percent < 45 || voltage < 12.4) return 'warning';
+  if (percent < batteryThresholds.dangerPercent || voltage < batteryThresholds.dangerVoltage) return 'danger';
+  if (percent < batteryThresholds.warningPercent || voltage < batteryThresholds.warningVoltage) return 'warning';
   return 'safe';
 }
 

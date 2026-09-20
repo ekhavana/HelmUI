@@ -10,7 +10,7 @@ export function BatteryCard() {
   return (
     <Card title="House Battery" eyebrow="Electrical">
       <div className="flex items-center justify-between">
-        <div className="text-5xl font-bold leading-none tabular-nums text-white">{battery.housePercent}<span className="text-xl text-slate-300">%</span></div>
+        <div className="text-5xl font-bold leading-none tabular-nums text-white">{battery.housePercent === null ? '--' : battery.housePercent}<span className="text-xl text-slate-300">{battery.housePercent === null ? '' : '%'}</span></div>
         <BatteryFull className="h-12 w-12 shrink-0 text-emerald-300/85" />
       </div>
       <div className="mt-3">

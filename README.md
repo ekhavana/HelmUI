@@ -7,7 +7,7 @@ HelmUI is a fullscreen browser/PWA frontend for a Raspberry Pi 5 running OpenPlo
 ## Current status
 
 - Touch-first Helm dashboard
-- Runtime profiles: development simulation, staging live, production live
+- Runtime profiles: staging live (direct Signal K) and production live (bridge)
 - Optional Signal K direct client for staging
 - Multi-source production bridge path (Signal K + MQTT + Node-RED)
 - Persistent safety strip
@@ -54,11 +54,12 @@ For fullscreen testing on macOS Chrome, press `Control + Command + F`.
 
 ## Data modes
 
-HelmUI runtime is profile-driven:
+HelmUI is live-data only. There is no simulation mode: every displayed value
+must arrive from the vessel, and unknown values render as `--` until real
+telemetry fills them in.
 
-- `development-sim`: uses internal simulation tick loop
-- `staging-live`: expects live telemetry; allows Signal K direct mode
-- `production-live`: forbids simulation and requires bridge transport
+- `staging-live`: direct Signal K WebSocket connection
+- `production-live`: requires the bridge transport (Signal K + MQTT + Node-RED)
 
 ### Signal K direct (staging)
 

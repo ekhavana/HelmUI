@@ -6,7 +6,96 @@ export function defaultSourceState() {
   };
 }
 
-export function normalizeSignalKDelta(delta) {
+function isOwnVesselContext(context, selfContext = 'vessels.self') {
+  if (!context || context === 'vessels.self') return true;
+  return context === selfContext;
+}
+
+function vesselIdFromContext(context) {
+  const mmsi = String(context).match(/mmsi[:.](\d+)/i);
+  if (mmsi) return mmsi[1];
+  return String(context).replace(/^vessels\./, '');
+}
+
+function numeric(value) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function normalizeAisDelta(delta, context) {
+  const id = vesselIdFromContext(context);
+  const contact = { id, mmsi: id };
+  let touched = false;
+  const timestamp = delta?.updates?.find((group) => typeof group?.timestamp === 'string')?.timestamp;
+
+  for (const group of Array.isArray(delta?.updates) ? delta.updates : []) {
+    for (const item of group.values ?? []) {
+      const value = item?.value;
+      switch (item?.path) {
+        case 'navigation.position':
+          if (value && typeof value === 'object') {
+            const lat = numeric(value.latitude);
+            const lon = numeric(value.longitude);
+            if (lat !== null && lon !== null) {
+              contact.latitude = lat;
+              contact.longitude = lon;
+              touched = true;
+            }
+          }
+          break;
+        case 'navigation.speedOverGround': {
+          const sog = numeric(value);
+          if (sog !== null) {
+            contact.sogKts = sog * 1.94384;
+            touched = true;
+          }
+          break;
+        }
+        case 'navigation.courseOverGroundTrue': {
+          const cog = numeric(value);
+          if (cog !== null) {
+            contact.cogTrue = (cog * 180) / Math.PI;
+            touched = true;
+          }
+          break;
+        }
+        case 'navigation.headingTrue': {
+          const heading = numeric(value);
+          if (heading !== null) {
+            contact.headingTrue = (heading * 180) / Math.PI;
+            touched = true;
+          }
+          break;
+        }
+        case 'name':
+          if (typeof value === 'string' && value.trim()) {
+            contact.name = value.trim();
+            touched = true;
+          }
+          break;
+        case 'mmsi':
+          if (value !== undefined && value !== null && String(value).trim()) {
+            contact.mmsi = String(value).trim();
+            touched = true;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  if (!touched) return {};
+  contact.lastSeen = timestamp ?? new Date().toISOString();
+  return { ais: { contacts: { [id]: contact } } };
+}
+
+export function normalizeSignalKDelta(delta, options = {}) {
+  const selfContext = options.selfContext ?? 'vessels.self';
+  const context = typeof delta?.context === 'string' ? delta.context : 'vessels.self';
+  if (!isOwnVesselContext(context, selfContext)) {
+    return normalizeAisDelta(delta, context);
+  }
+
   const patch = {};
   const updates = Array.isArray(delta?.updates) ? delta.updates : [];
   for (const group of updates) {
@@ -34,10 +123,19 @@ export function normalizeSignalKDelta(delta) {
         case 'environment.wind.speedApparent':
           if (typeof value === 'number') patch.wind = { ...(patch.wind ?? {}), awsKts: value * 1.94384 };
           break;
-        case 'environment.wind.speedTrue':
-          if (typeof value === 'number') patch.wind = { ...(patch.wind ?? {}), twsKts: value * 1.94384 };
-          break;
-        case 'navigation.position':
+    case 'environment.wind.speedTrue':
+      if (typeof value === 'number') patch.wind = { ...(patch.wind ?? {}), twsKts: value * 1.94384 };
+      break;
+    case 'steering.autopilot.mode':
+      if (typeof value === 'string') patch.autopilot = { ...(patch.autopilot ?? {}), state: value.toLowerCase() };
+      break;
+    case 'steering.autopilot.target.headingTrue':
+      if (typeof value === 'number') {
+        const headingDeg = ((value * 180) / Math.PI % 360 + 360) % 360;
+        patch.autopilot = { ...(patch.autopilot ?? {}), headingTarget: headingDeg };
+      }
+      break;
+    case 'navigation.position':
           if (value && typeof value === 'object' && typeof value.latitude === 'number' && typeof value.longitude === 'number') {
             patch.navigation = { ...(patch.navigation ?? {}), latitude: value.latitude, longitude: value.longitude };
           }

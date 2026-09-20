@@ -1,8 +1,10 @@
 import { useBoatStore } from '../../store/boatStore';
 import { ModeScreen } from '../screens/ModeScreen';
 import { BottomNav } from './BottomNav';
+import { EventLogOverlay } from './EventLogOverlay';
 import { SafetyStrip } from './SafetyStrip';
 import { StatusBar } from './StatusBar';
+import { TouchLockOverlay } from './TouchLockOverlay';
 
 export function AppShell() {
   const settings = useBoatStore((state) => state.settings);
@@ -17,6 +19,8 @@ export function AppShell() {
       <ModeScreen />
       <BottomNav />
       <StatusBar />
+      <EventLogOverlay />
+      <TouchLockOverlay />
     </main>
   );
 }
