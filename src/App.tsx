@@ -7,7 +7,7 @@ import { createSignalKClient } from './signalk/client';
 import { useBoatStore } from './store/boatStore';
 
 export default function App() {
-  const tickSimulation = useBoatStore((state) => state.tickSimulation);
+  const refreshAlarms = useBoatStore((state) => state.refreshAlarms);
   const applyBridgeMessage = useBoatStore((state) => state.applyBridgeMessage);
   const applySignalKDelta = useBoatStore((state) => state.applySignalKDelta);
   const setSignalKState = useBoatStore((state) => state.setSignalKState);
@@ -24,15 +24,12 @@ export default function App() {
     }
   }, [setSignalKState]);
 
+  // Re-evaluate alarms on a fixed cadence so stale-source and time-derived
+  // conditions fire even when the telemetry stream goes completely quiet.
   useEffect(() => {
-    if (runtimeConfig.profile !== 'development-sim') return;
-    if (runtimeConfig.telemetry.requireLiveData) return;
-    if (runtimeConfig.signalK.enabled) return;
-
-    const interval = window.setInterval(tickSimulation, 1000);
-
+    const interval = window.setInterval(refreshAlarms, 10_000);
     return () => window.clearInterval(interval);
-  }, [tickSimulation]);
+  }, [refreshAlarms]);
 
   useEffect(() => {
     if (runtimeConfig.telemetry.transport !== 'bridge') return;

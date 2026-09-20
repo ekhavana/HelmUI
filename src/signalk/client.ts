@@ -2,14 +2,24 @@ import type { SignalKConnectionState, SignalKDeltaMessage } from './types';
 
 interface SignalKClientOptions {
   url: string;
-  onDelta: (delta: SignalKDeltaMessage) => void;
+  onDelta: (delta: SignalKDeltaMessage, selfContext: string) => void;
   onStateChange?: (state: SignalKConnectionState) => void;
 }
+
+const AIS_SUBSCRIBE_PATHS = [
+  'navigation.position',
+  'navigation.speedOverGround',
+  'navigation.courseOverGroundTrue',
+  'navigation.headingTrue',
+  'name',
+  'mmsi',
+];
 
 export function createSignalKClient({ url, onDelta, onStateChange }: SignalKClientOptions) {
   let socket: WebSocket | null = null;
   let reconnectTimer: number | null = null;
   let manuallyClosed = false;
+  let selfContext = 'vessels.self';
 
   function setState(state: SignalKConnectionState): void {
     onStateChange?.(state);
@@ -51,6 +61,8 @@ export function createSignalKClient({ url, onDelta, onStateChange }: SignalKClie
         'environment.wind.angleApparent',
         'environment.wind.speedApparent',
         'environment.wind.speedTrue',
+        'steering.autopilot.mode',
+        'steering.autopilot.target.headingTrue',
         'electrical.batteries.house.voltage',
         'electrical.batteries.house.current',
         'electrical.batteries.house.capacity.stateOfCharge',
@@ -72,11 +84,22 @@ export function createSignalKClient({ url, onDelta, onStateChange }: SignalKClie
           subscribe: paths.map((path) => ({ path, policy: 'instant' })),
         }),
       );
+      socket?.send(
+        JSON.stringify({
+          context: 'vessels.*',
+          subscribe: AIS_SUBSCRIBE_PATHS.map((path) => ({ path, policy: 'instant', minPeriod: 1000 })),
+        }),
+      );
     });
 
     socket.addEventListener('message', (event) => {
       try {
-        onDelta(JSON.parse(event.data) as SignalKDeltaMessage);
+        const message = JSON.parse(event.data) as SignalKDeltaMessage & { self?: string };
+        if (typeof message.self === 'string' && !message.updates) {
+          selfContext = message.self;
+          return;
+        }
+        onDelta(message, selfContext);
       } catch {
         setState('error');
       }

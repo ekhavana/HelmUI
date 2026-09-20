@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { mockBoatData, type BoatData } from '../data/mockBoatData';
+import { runtimeConfig } from '../config/runtime';
+import { emptyBoatData, type BoatData } from '../data/boatData';
+import { mergeAisContacts, summarizeAis } from '../domain/ais/aggregateAis';
 import type { BridgeMessage, BridgeSourceName, BridgeSourceState } from '../bridge/types';
 import { evaluateAlarms } from '../domain/alarms/evaluateAlarms';
 import type { AlarmItem } from '../domain/alarms/types';
-import { applyBoatDataPatch, mapSignalKDelta } from '../signalk/mapDelta';
+import { mapSignalKDelta, type BoatDataPatch } from '../signalk/mapDelta';
 import type { SignalKConnectionState, SignalKDeltaMessage } from '../signalk/types';
 import { haversineMeters } from '../utils/geo';
 
@@ -18,7 +20,6 @@ export interface UiSettings {
   depthWarningFt: number;
   autoLaunch: boolean;
   touchLock: boolean;
-  offlineMode: boolean;
 }
 
 export interface AssistantMessage {
@@ -46,8 +47,8 @@ interface BoatStore {
   clearAiMessages: () => void;
   setSignalKState: (signalKState: SignalKConnectionState) => void;
   applyBridgeMessage: (message: BridgeMessage) => void;
-  applySignalKDelta: (delta: SignalKDeltaMessage) => void;
-  tickSimulation: () => void;
+  applySignalKDelta: (delta: SignalKDeltaMessage, selfContext?: string) => void;
+  refreshAlarms: () => void;
 }
 
 const defaultSettings: UiSettings = {
@@ -56,7 +57,6 @@ const defaultSettings: UiSettings = {
   depthWarningFt: 6,
   autoLaunch: true,
   touchLock: false,
-  offlineMode: true,
 };
 
 const defaultAiMessages: AssistantMessage[] = [
@@ -69,12 +69,18 @@ const defaultSourceHealth: Record<BridgeSourceName, BridgeSourceState> = {
   nodered: { connected: false, lastSeen: null },
 };
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
+const activeTelemetrySources = runtimeConfig.telemetry.activeSources;
+
+function evaluateStateAlarms(input: {
+  data: BoatData;
+  settings: UiSettings;
+  sourceHealth: Record<BridgeSourceName, BridgeSourceState>;
+}): AlarmItem[] {
+  return evaluateAlarms({ ...input, activeSources: activeTelemetrySources });
 }
 
-function drift(value: number, amount: number, min: number, max: number): number {
-  return clamp(value + (Math.random() - 0.5) * amount, min, max);
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
 function withAnchorDrift(data: BoatData): BoatData {
@@ -85,33 +91,46 @@ function withAnchorDrift(data: BoatData): BoatData {
   return { ...data, anchor: { ...data.anchor, distanceFromSetMeters } };
 }
 
-function mergeBoatData(base: BoatData, patch: Partial<BoatData>): BoatData {
+function withLiveAis(data: BoatData): BoatData {
+  return { ...data, ais: summarizeAis(data.ais.contacts, data.navigation) };
+}
+
+function withDerivedTelemetry(data: BoatData): BoatData {
+  return withLiveAis(withAnchorDrift(data));
+}
+
+function mergeBoatData(base: BoatData, patch: Partial<BoatData> | BoatDataPatch): BoatData {
+  const next = patch as Partial<BoatData> & BoatDataPatch;
   return {
     ...base,
-    ...patch,
-    depth: { ...base.depth, ...(patch.depth ?? {}) },
-    speed: { ...base.speed, ...(patch.speed ?? {}) },
-    navigation: { ...base.navigation, ...(patch.navigation ?? {}) },
-    wind: { ...base.wind, ...(patch.wind ?? {}) },
-    ais: { ...base.ais, ...(patch.ais ?? {}) },
-    autopilot: { ...base.autopilot, ...(patch.autopilot ?? {}) },
-    battery: { ...base.battery, ...(patch.battery ?? {}) },
-    bilge: { ...base.bilge, ...(patch.bilge ?? {}) },
-    engine: { ...base.engine, ...(patch.engine ?? {}) },
-    tanks: { ...base.tanks, ...(patch.tanks ?? {}) },
-    power: { ...base.power, ...(patch.power ?? {}) },
-    network: { ...base.network, ...(patch.network ?? {}) },
-    anchor: { ...base.anchor, ...(patch.anchor ?? {}) },
-    route: { ...base.route, ...(patch.route ?? {}) },
-    environment: { ...base.environment, ...(patch.environment ?? {}) },
-    time: { ...base.time, ...(patch.time ?? {}) },
+    ...next,
+    depth: { ...base.depth, ...(next.depth ?? {}) },
+    speed: { ...base.speed, ...(next.speed ?? {}) },
+    navigation: { ...base.navigation, ...(next.navigation ?? {}) },
+    wind: { ...base.wind, ...(next.wind ?? {}) },
+    ais: {
+      ...base.ais,
+      ...(next.ais ?? {}),
+      contacts: mergeAisContacts(base.ais.contacts, next.ais?.contacts),
+    },
+    autopilot: { ...base.autopilot, ...(next.autopilot ?? {}) },
+    battery: { ...base.battery, ...(next.battery ?? {}) },
+    bilge: { ...base.bilge, ...(next.bilge ?? {}) },
+    engine: { ...base.engine, ...(next.engine ?? {}) },
+    tanks: { ...base.tanks, ...(next.tanks ?? {}) },
+    power: { ...base.power, ...(next.power ?? {}) },
+    network: { ...base.network, ...(next.network ?? {}) },
+    anchor: { ...base.anchor, ...(next.anchor ?? {}) },
+    route: { ...base.route, ...(next.route ?? {}) },
+    environment: { ...base.environment, ...(next.environment ?? {}) },
+    time: { ...base.time, ...(next.time ?? {}) },
   };
 }
 
 export const useBoatStore = create<BoatStore>()(
   persist(
     (set) => ({
-      data: mockBoatData,
+      data: emptyBoatData,
       mode: 'helm',
       settings: defaultSettings,
       aiMessages: defaultAiMessages,
@@ -127,7 +146,7 @@ export const useBoatStore = create<BoatStore>()(
             ...state.settings,
             ...patch,
           },
-          alarms: evaluateAlarms({
+          alarms: evaluateStateAlarms({
             data: state.data,
             settings: { ...state.settings, ...patch },
             sourceHealth: state.sourceHealth,
@@ -140,15 +159,15 @@ export const useBoatStore = create<BoatStore>()(
             ...state.data,
             anchor: {
               ...state.data.anchor,
-              radiusMeters: mockBoatData.anchor.radiusMeters,
+              radiusMeters: emptyBoatData.anchor.radiusMeters,
             },
           },
-          alarms: evaluateAlarms({
+          alarms: evaluateStateAlarms({
             data: {
               ...state.data,
               anchor: {
                 ...state.data.anchor,
-                radiusMeters: mockBoatData.anchor.radiusMeters,
+                radiusMeters: emptyBoatData.anchor.radiusMeters,
               },
             },
             settings: defaultSettings,
@@ -180,7 +199,7 @@ export const useBoatStore = create<BoatStore>()(
           };
           return {
             data,
-            alarms: evaluateAlarms({
+            alarms: evaluateStateAlarms({
               data,
               settings: state.settings,
               sourceHealth: state.sourceHealth,
@@ -205,7 +224,7 @@ export const useBoatStore = create<BoatStore>()(
           return {
             signalKState,
             sourceHealth: nextSourceHealth,
-            alarms: evaluateAlarms({
+            alarms: evaluateStateAlarms({
               data: state.data,
               settings: state.settings,
               sourceHealth: nextSourceHealth,
@@ -215,14 +234,14 @@ export const useBoatStore = create<BoatStore>()(
       applyBridgeMessage: (message) =>
         set((state) => {
           const sourceHealth = message.sources ?? state.sourceHealth;
-          const nextData = withAnchorDrift(
+          const nextData = withDerivedTelemetry(
             message.type === 'snapshot'
               ? mergeBoatData(state.data, message.data)
               : message.type === 'delta'
                 ? mergeBoatData(state.data, message.patch)
                 : state.data,
           );
-          const alarms = evaluateAlarms({
+          const alarms = evaluateStateAlarms({
             data: nextData,
             settings: state.settings,
             sourceHealth,
@@ -235,10 +254,10 @@ export const useBoatStore = create<BoatStore>()(
             alarms,
           };
         }),
-      applySignalKDelta: (delta) =>
+      applySignalKDelta: (delta, selfContext = 'vessels.self') =>
         set((state) => {
           const timestamp = new Date().toISOString();
-          const data = withAnchorDrift(applyBoatDataPatch(state.data, mapSignalKDelta(delta)));
+          const data = withDerivedTelemetry(mergeBoatData(state.data, mapSignalKDelta(delta, selfContext)));
           const sourceHealth = {
             ...state.sourceHealth,
             signalk: {
@@ -251,104 +270,21 @@ export const useBoatStore = create<BoatStore>()(
             data,
             sourceHealth,
             telemetryUpdatedAt: timestamp,
-            alarms: evaluateAlarms({
+            alarms: evaluateStateAlarms({
               data,
               settings: state.settings,
               sourceHealth,
             }),
           };
         }),
-      tickSimulation: () =>
-        set((state) => {
-          const depth = drift(state.data.depth.belowTransducerFt, 0.28, 4.8, 18);
-          const closestNm = drift(state.data.ais.closestNm, 0.16, 0.45, 3.8);
-          const awaDeg = Math.round(drift(state.data.wind.awaDeg, 8, 60, 170));
-          const targets = closestNm < 1.8 ? 2 : closestNm < 2.6 ? 1 : 0;
-
-          const data = {
-            ...state.data,
-            depth: {
-              ...state.data.depth,
-              belowTransducerFt: depth,
-              trend: depth < state.data.depth.belowTransducerFt - 0.03 ? 'falling' : depth > state.data.depth.belowTransducerFt + 0.03 ? 'rising' : 'stable',
-            },
-            speed: {
-              sogKts: drift(state.data.speed.sogKts, 0.18, 0, 8.5),
-              stwKts: drift(state.data.speed.stwKts, 0.2, 0, 8.5),
-            },
-            navigation: {
-              ...state.data.navigation,
-              headingTrue: Math.round(drift(state.data.navigation.headingTrue, 2, 0, 359)),
-              cogTrue: Math.round(drift(state.data.navigation.cogTrue, 2.5, 0, 359)),
-            },
-            wind: {
-              ...state.data.wind,
-              awaDeg,
-              awsKts: drift(state.data.wind.awsKts, 0.45, 3, 18),
-              twsKts: drift(state.data.wind.twsKts, 0.4, 4, 20),
-              side: 'Port',
-            },
-            ais: {
-              ...state.data.ais,
-              targets,
-              closestNm,
-              riskLevel: closestNm < 0.75 ? 'danger' : closestNm < 2 ? 'warning' : 'safe',
-            },
-            battery: {
-              housePercent: Math.round(drift(state.data.battery.housePercent, 0.12, 55, 96)),
-              houseVoltage: drift(state.data.battery.houseVoltage, 0.04, 12.4, 13.7),
-              currentAmps: drift(state.data.battery.currentAmps, 0.22, -5.5, 3.2),
-            },
-            engine: {
-              ...state.data.engine,
-              rpm: Math.round(drift(state.data.engine.rpm, 70, 650, 2900)),
-              coolantTempC: drift(state.data.engine.coolantTempC, 0.3, 62, 88),
-              oilPressurePsi: drift(state.data.engine.oilPressurePsi, 0.8, 32, 65),
-              hours: state.data.engine.hours + 0.002,
-              fuelRateLph: drift(state.data.engine.fuelRateLph, 0.25, 1.2, 13.5),
-              alternatorVoltage: drift(state.data.engine.alternatorVoltage, 0.08, 13.6, 14.6),
-            },
-            tanks: {
-              fuelPercent: drift(state.data.tanks.fuelPercent, 0.04, 12, 100),
-              freshWaterPercent: drift(state.data.tanks.freshWaterPercent, 0.05, 20, 100),
-              wastePercent: drift(state.data.tanks.wastePercent, 0.05, 5, 95),
-            },
-            power: {
-              ...state.data.power,
-              solarWatts: Math.round(drift(state.data.power.solarWatts, 18, 20, 720)),
-              loadWatts: Math.round(drift(state.data.power.loadWatts, 12, 140, 980)),
-              inverterOn: state.data.power.loadWatts > 600 ? true : state.data.power.loadWatts < 420 ? false : state.data.power.inverterOn,
-            },
-            network: {
-              ...state.data.network,
-              nodered: Math.random() < 0.98 ? 'online' : 'degraded',
-            },
-            anchor: {
-              ...state.data.anchor,
-              distanceFromSetMeters: drift(state.data.anchor.distanceFromSetMeters, 0.7, 1, 20),
-            },
-            route: {
-              ...state.data.route,
-              distanceNm: drift(state.data.route.distanceNm, 0.12, 0.1, 24),
-              etaMinutes: Math.max(2, Math.round(drift(state.data.route.etaMinutes, 1.8, 2, 240))),
-              crossTrackErrorNm: drift(state.data.route.crossTrackErrorNm, 0.01, 0, 0.45),
-            },
-          };
-          const sourceHealth = {
-            signalk: { connected: true, lastSeen: new Date().toISOString() },
-            mqtt: { connected: true, lastSeen: new Date().toISOString() },
-            nodered: { connected: true, lastSeen: new Date().toISOString() },
-          } satisfies Record<BridgeSourceName, BridgeSourceState>;
-
-          return {
-            data: {
-              ...data,
-            },
-            sourceHealth,
-            telemetryUpdatedAt: new Date().toISOString(),
-            alarms: evaluateAlarms({ data, settings: state.settings, sourceHealth }),
-          };
-        }),
+      refreshAlarms: () =>
+        set((state) => ({
+          alarms: evaluateStateAlarms({
+            data: state.data,
+            settings: state.settings,
+            sourceHealth: state.sourceHealth,
+          }),
+        })),
     }),
     {
       name: 'helmui-settings',

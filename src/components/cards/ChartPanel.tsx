@@ -3,10 +3,8 @@ import { Navigation, Ship } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useBoatStore } from '../../store/boatStore';
 import { formatDegrees, formatNumber } from '../../utils/formatters';
+import { useAisMarkers } from '../../utils/useAisMarkers';
 import { useLeafletMap, vesselIcon } from '../../utils/useLeafletMap';
-
-const DEFAULT_LAT = 40.7128;
-const DEFAULT_LON = -74.006;
 
 export function ChartPanel() {
   const navigation = useBoatStore((state) => state.data.navigation);
@@ -15,16 +13,23 @@ export function ChartPanel() {
 
   const { containerRef: mapContainerRef, mapRef } = useLeafletMap({ zoom: 13 });
   const markerRef = useRef<L.Marker | null>(null);
+  useAisMarkers(mapRef, ais.contacts);
 
-  const lat = navigation.latitude ?? DEFAULT_LAT;
-  const lon = navigation.longitude ?? DEFAULT_LON;
-  const hasPosition = navigation.latitude !== null && navigation.longitude !== null;
+  const lat = navigation.latitude;
+  const lon = navigation.longitude;
+  const hasPosition = lat !== null && lon !== null;
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    const icon = vesselIcon(navigation.headingTrue);
+    if (!hasPosition) {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      return;
+    }
+
+    const icon = vesselIcon(navigation.headingTrue ?? 0);
     if (markerRef.current) {
       markerRef.current.setIcon(icon);
       markerRef.current.setLatLng([lat, lon]);
@@ -32,15 +37,13 @@ export function ChartPanel() {
       markerRef.current = L.marker([lat, lon], { icon }).addTo(map);
     }
 
-    if (hasPosition) {
-      map.setView([lat, lon], map.getZoom(), { animate: true });
-    }
+    map.setView([lat, lon], map.getZoom(), { animate: true });
 
     return () => {
       markerRef.current?.remove();
       markerRef.current = null;
     };
-  }, [lat, lon, navigation.headingTrue, hasPosition]);
+  }, [lat, lon, navigation.headingTrue, hasPosition, mapRef]);
 
   return (
     <section className="relative h-full overflow-hidden rounded-[2rem] border border-cyan-300/25">

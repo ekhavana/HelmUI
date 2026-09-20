@@ -9,6 +9,7 @@ function assistantReply(input: string, context: ReturnType<typeof buildContext>)
   const text = input.toLowerCase();
 
   if (text.includes('engine')) {
+    if (context.engineRpm == null) return 'Engine data is not available yet.';
     return `Engine is at ${Math.round(context.engineRpm)} RPM, coolant ${formatNumber(context.coolant)} C, oil ${formatNumber(context.oil)} psi.`;
   }
   if (text.includes('anchor')) {

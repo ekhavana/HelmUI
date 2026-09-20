@@ -1,5 +1,7 @@
 import { Monitor, MoonStar, Radio, Shield, SlidersHorizontal, Sun, Wifi } from 'lucide-react';
+import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
+import { formatNumber } from '../../utils/formatters';
 import { Card } from '../ui/Card';
 
 export function MenuScreen() {
@@ -11,6 +13,7 @@ export function MenuScreen() {
   const updateSettings = useBoatStore((state) => state.updateSettings);
   const resetSettings = useBoatStore((state) => state.resetSettings);
   const setAnchorRadius = useBoatStore((state) => state.setAnchorRadius);
+  const activeSources = runtimeConfig.telemetry.activeSources;
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_420px] gap-4">
@@ -59,15 +62,15 @@ export function MenuScreen() {
           <div className="space-y-3 text-sm font-semibold text-slate-200">
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><Radio className="h-4 w-4 text-cyan-200" /> Signal K</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceHealth.signalk.connected || signalKState === 'disabled' ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{signalKState === 'disabled' ? 'sim' : sourceHealth.signalk.connected ? 'online' : 'down'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceHealth.signalk.connected ? 'bg-emerald-500/20 text-emerald-200' : signalKState === 'disabled' ? 'bg-slate-700/40 text-slate-300' : 'bg-red-500/20 text-red-200'}`}>{signalKState === 'disabled' ? 'off' : sourceHealth.signalk.connected ? 'online' : 'down'}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><Wifi className="h-4 w-4 text-cyan-200" /> MQTT</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceHealth.mqtt.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.mqtt.connected ? 'online' : 'down'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'online' : 'down') : 'n/a'}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-cyan-200" /> Node-RED</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.nodered.connected ? 'online' : 'down'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'online' : 'down') : 'n/a'}</span>
             </div>
           </div>
         </Card>
@@ -86,7 +89,7 @@ export function MenuScreen() {
                 type="range"
                 value={settings.depthWarningFt}
               />
-              <div className="text-xs text-slate-400">Current depth: {depth.belowTransducerFt.toFixed(1)} ft</div>
+              <div className="text-xs text-slate-400">Current depth: {formatNumber(depth.belowTransducerFt)} ft</div>
             </div>
             <div className="rounded-xl bg-slate-950/50 px-3 py-2">
               <div className="text-xs uppercase tracking-[0.18em] text-slate-400">Anchor Radius Alarm</div>
@@ -107,7 +110,6 @@ export function MenuScreen() {
           <div className="space-y-2 text-sm font-semibold text-slate-200">
             <button className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left" onClick={() => updateSettings({ autoLaunch: !settings.autoLaunch })} type="button"><span>Auto-launch on boot</span><span className={settings.autoLaunch ? 'text-emerald-200' : 'text-slate-300'}>{settings.autoLaunch ? 'On' : 'Off'}</span></button>
             <button className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left" onClick={() => updateSettings({ touchLock: !settings.touchLock })} type="button"><span>Touch input lock</span><span className={settings.touchLock ? 'text-amber-200' : 'text-slate-300'}>{settings.touchLock ? 'On' : 'Off'}</span></button>
-            <button className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left" onClick={() => updateSettings({ offlineMode: !settings.offlineMode })} type="button"><span>Offline mode</span><span className={settings.offlineMode ? 'text-emerald-200' : 'text-slate-300'}>{settings.offlineMode ? 'Ready' : 'Disabled'}</span></button>
           </div>
         </Card>
       </div>
