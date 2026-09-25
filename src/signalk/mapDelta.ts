@@ -125,7 +125,8 @@ function mapValue(update: SignalKValueUpdate): BoatDataPatch {
       return numberValue === null ? {} : { wind: { awsKts: metersPerSecondToKnots(numberValue) } };
     case 'environment.wind.speedTrue':
       return numberValue === null ? {} : { wind: { twsKts: metersPerSecondToKnots(numberValue) } };
-    case 'steering.autopilot.mode': {
+    case 'steering.autopilot.mode':
+    case 'steering.autopilot.state': {
       const mode = text(value);
       return mode === null ? {} : { autopilot: { state: mode.toLowerCase() } };
     }

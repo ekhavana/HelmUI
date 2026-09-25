@@ -12,6 +12,7 @@ export interface BridgeSnapshotMessage {
   type: 'snapshot';
   timestamp: string;
   data: Partial<BoatData>;
+  ui?: { brightness?: number };
   sources: Record<BridgeSourceName, BridgeSourceState>;
 }
 
@@ -19,6 +20,7 @@ export interface BridgeDeltaMessage {
   type: 'delta';
   timestamp: string;
   patch: Partial<BoatData>;
+  ui?: { brightness?: number };
   sources: Record<BridgeSourceName, BridgeSourceState>;
 }
 

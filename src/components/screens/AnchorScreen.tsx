@@ -2,6 +2,7 @@ import L from 'leaflet';
 import { Anchor, BellRing, Wind } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useBoatStore } from '../../store/boatStore';
+import { displayedDepthFt } from '../../utils/depth';
 import { formatFeet, formatNumber } from '../../utils/formatters';
 import { anchorIcon, useLeafletMap, vesselIcon } from '../../utils/useLeafletMap';
 import { Card } from '../ui/Card';
@@ -9,7 +10,7 @@ import { Card } from '../ui/Card';
 export function AnchorScreen() {
   const anchor = useBoatStore((state) => state.data.anchor);
   const navigation = useBoatStore((state) => state.data.navigation);
-  const depth = useBoatStore((state) => state.data.depth.belowTransducerFt);
+  const depth = useBoatStore((state) => displayedDepthFt(state.data.depth.belowTransducerFt, state.settings.depthOffsetFt));
   const wind = useBoatStore((state) => state.data.wind);
   const setAnchorPosition = useBoatStore((state) => state.setAnchorPosition);
   const clearAnchorPosition = useBoatStore((state) => state.clearAnchorPosition);

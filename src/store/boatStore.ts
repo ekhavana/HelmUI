@@ -5,6 +5,7 @@ import { emptyBoatData, type BoatData } from '../data/boatData';
 import { mergeAisContacts, summarizeAis } from '../domain/ais/aggregateAis';
 import type { BridgeMessage, BridgeSourceName, BridgeSourceState } from '../bridge/types';
 import { evaluateAlarms } from '../domain/alarms/evaluateAlarms';
+import { isHelmSettingsProfile, SETTINGS_PROFILE_VERSION, type HelmSettingsProfile } from '../domain/settings/profile';
 import type { AlarmItem } from '../domain/alarms/types';
 import { mapSignalKDelta, type BoatDataPatch } from '../signalk/mapDelta';
 import type { SignalKConnectionState, SignalKDeltaMessage } from '../signalk/types';
@@ -18,6 +19,7 @@ export interface UiSettings {
   brightness: number;
   theme: DisplayTheme;
   depthWarningFt: number;
+  depthOffsetFt: number;
   autoLaunch: boolean;
   touchLock: boolean;
 }
@@ -49,12 +51,15 @@ interface BoatStore {
   applyBridgeMessage: (message: BridgeMessage) => void;
   applySignalKDelta: (delta: SignalKDeltaMessage, selfContext?: string) => void;
   refreshAlarms: () => void;
+  exportSettingsProfile: () => HelmSettingsProfile;
+  importSettingsProfile: (value: unknown) => boolean;
 }
 
 const defaultSettings: UiSettings = {
   brightness: 82,
   theme: 'auto',
   depthWarningFt: 6,
+  depthOffsetFt: 0,
   autoLaunch: true,
   touchLock: false,
 };
@@ -129,15 +134,15 @@ function mergeBoatData(base: BoatData, patch: Partial<BoatData> | BoatDataPatch)
 
 export const useBoatStore = create<BoatStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       data: emptyBoatData,
-      mode: 'helm',
+      mode: 'helm' as AppMode,
       settings: defaultSettings,
       aiMessages: defaultAiMessages,
       signalKState: 'disabled',
       sourceHealth: defaultSourceHealth,
-      telemetryUpdatedAt: null,
-      alarms: [],
+      telemetryUpdatedAt: null as string | null,
+      alarms: [] as AlarmItem[],
       setMode: (mode) => set({ mode }),
       setBoatData: (data) => set({ data }),
       updateSettings: (patch) =>
@@ -241,14 +246,20 @@ export const useBoatStore = create<BoatStore>()(
                 ? mergeBoatData(state.data, message.patch)
                 : state.data,
           );
+          const brightness = message.type === 'health' ? undefined : message.ui?.brightness;
+          const settings =
+            typeof brightness === 'number'
+              ? { ...state.settings, brightness: clamp(brightness, 35, 100) }
+              : state.settings;
           const alarms = evaluateStateAlarms({
             data: nextData,
-            settings: state.settings,
+            settings,
             sourceHealth,
           });
 
           return {
             data: nextData,
+            settings,
             sourceHealth,
             telemetryUpdatedAt: message.timestamp ?? new Date().toISOString(),
             alarms,
@@ -285,6 +296,44 @@ export const useBoatStore = create<BoatStore>()(
             sourceHealth: state.sourceHealth,
           }),
         })),
+      exportSettingsProfile: (): HelmSettingsProfile => {
+        const state = get();
+        return {
+          version: SETTINGS_PROFILE_VERSION,
+          exportedAt: new Date().toISOString(),
+          settings: { ...state.settings },
+          anchorRadiusMeters: state.data.anchor.radiusMeters,
+        };
+      },
+      importSettingsProfile: (value: unknown) => {
+        if (!isHelmSettingsProfile(value)) return false;
+        set((state) => {
+          const settings = {
+            ...state.settings,
+            ...value.settings,
+            brightness: clamp(value.settings.brightness, 35, 100),
+            depthWarningFt: clamp(value.settings.depthWarningFt, 4, 20),
+            depthOffsetFt: clamp(value.settings.depthOffsetFt, -6, 6),
+          };
+          const data = {
+            ...state.data,
+            anchor: {
+              ...state.data.anchor,
+              radiusMeters: clamp(value.anchorRadiusMeters, 8, 120),
+            },
+          };
+          return {
+            settings,
+            data,
+            alarms: evaluateStateAlarms({
+              data,
+              settings,
+              sourceHealth: state.sourceHealth,
+            }),
+          };
+        });
+        return true;
+      },
     }),
     {
       name: 'helmui-settings',
@@ -317,6 +366,7 @@ export const useBoatStore = create<BoatStore>()(
           settings: {
             ...currentState.settings,
             ...(persisted.settings ?? {}),
+            depthOffsetFt: persisted.settings?.depthOffsetFt ?? currentState.settings.depthOffsetFt,
           },
           aiMessages: persisted.aiMessages?.length ? persisted.aiMessages : currentState.aiMessages,
           sourceHealth: currentState.sourceHealth,
@@ -329,7 +379,7 @@ export const useBoatStore = create<BoatStore>()(
               radiusMeters: persisted.data?.anchor?.radiusMeters ?? currentState.data.anchor.radiusMeters,
             },
           },
-        };
+        } as BoatStore;
       },
     },
   ),

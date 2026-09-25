@@ -1,6 +1,8 @@
-import { Monitor, MoonStar, Radio, Shield, SlidersHorizontal, Sun, Wifi } from 'lucide-react';
+import { Download, Monitor, MoonStar, Radio, Shield, SlidersHorizontal, Sun, Upload, Wifi } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
+import { displayedDepthFt } from '../../utils/depth';
 import { formatNumber } from '../../utils/formatters';
 import { Card } from '../ui/Card';
 
@@ -13,7 +15,34 @@ export function MenuScreen() {
   const updateSettings = useBoatStore((state) => state.updateSettings);
   const resetSettings = useBoatStore((state) => state.resetSettings);
   const setAnchorRadius = useBoatStore((state) => state.setAnchorRadius);
+  const exportSettingsProfile = useBoatStore((state) => state.exportSettingsProfile);
+  const importSettingsProfile = useBoatStore((state) => state.importSettingsProfile);
   const activeSources = runtimeConfig.telemetry.activeSources;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [backupStatus, setBackupStatus] = useState<string | null>(null);
+  const calibratedDepth = displayedDepthFt(depth.belowTransducerFt, settings.depthOffsetFt);
+
+  function exportProfile() {
+    const profile = exportSettingsProfile();
+    const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `helmui-settings-${profile.exportedAt.slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setBackupStatus('Exported helmui-settings JSON');
+  }
+
+  async function importProfile(file: File | undefined) {
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text());
+      setBackupStatus(importSettingsProfile(parsed) ? `Restored ${file.name}` : 'Invalid settings profile');
+    } catch {
+      setBackupStatus('Could not read settings file');
+    }
+  }
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_420px] gap-4">
@@ -32,6 +61,7 @@ export function MenuScreen() {
               type="range"
               value={settings.brightness}
             />
+            <div className="text-xs text-slate-400">Knob: MQTT helmui/kiosk/brightness</div>
             <div className="flex items-center justify-between rounded-xl border border-slate-700/60 bg-slate-950/50 px-3 py-2">
               <button
                 className={`inline-flex items-center gap-2 rounded-lg px-2 py-1 ${settings.theme === 'day' ? 'bg-emerald-500/20 text-emerald-200' : 'text-slate-200'}`}
@@ -72,6 +102,7 @@ export function MenuScreen() {
               <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-cyan-200" /> Node-RED</span>
               <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'online' : 'down') : 'n/a'}</span>
             </div>
+            <div className="text-xs text-slate-400">AP: steering.autopilot.* or MQTT helmui/autopilot/state|heading</div>
           </div>
         </Card>
 
@@ -89,7 +120,20 @@ export function MenuScreen() {
                 type="range"
                 value={settings.depthWarningFt}
               />
-              <div className="text-xs text-slate-400">Current depth: {formatNumber(depth.belowTransducerFt)} ft</div>
+            </div>
+            <div className="rounded-xl bg-slate-950/50 px-3 py-2">
+              <div className="text-xs uppercase tracking-[0.18em] text-slate-400">Depth Offset</div>
+              <div className="mt-1 text-xl font-bold text-white">{settings.depthOffsetFt.toFixed(1)} ft</div>
+              <input
+                className="mt-2 w-full accent-cyan-300"
+                max={6}
+                min={-6}
+                onChange={(event) => updateSettings({ depthOffsetFt: Number(event.target.value) })}
+                step={0.1}
+                type="range"
+                value={settings.depthOffsetFt}
+              />
+              <div className="text-xs text-slate-400">Added to transducer reading. Calibrated depth: {formatNumber(calibratedDepth)} ft</div>
             </div>
             <div className="rounded-xl bg-slate-950/50 px-3 py-2">
               <div className="text-xs uppercase tracking-[0.18em] text-slate-400">Anchor Radius Alarm</div>
@@ -121,6 +165,35 @@ export function MenuScreen() {
             Core helm telemetry and alarms are active. Menu actions do not interrupt safety strip or bottom status updates.
           </div>
         </Card>
+        <Card title="Settings Backup" eyebrow="USB / File">
+          <div className="space-y-2">
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-300/35 bg-cyan-500/10 px-3 py-2 text-sm font-semibold text-cyan-100"
+              onClick={exportProfile}
+              type="button"
+            >
+              <Download className="h-4 w-4" /> Export settings JSON
+            </button>
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm font-semibold text-slate-200"
+              onClick={() => fileInputRef.current?.click()}
+              type="button"
+            >
+              <Upload className="h-4 w-4" /> Restore from file
+            </button>
+            <input
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => {
+                void importProfile(event.target.files?.[0]);
+                event.target.value = '';
+              }}
+              ref={fileInputRef}
+              type="file"
+            />
+            {backupStatus ? <div className="text-xs font-semibold text-slate-400">{backupStatus}</div> : null}
+          </div>
+        </Card>
         <Card title="Reset" eyebrow="Defaults" tone="warning">
           <button
             className="w-full rounded-xl border border-amber-300/35 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-500/20"
@@ -129,14 +202,6 @@ export function MenuScreen() {
           >
             Reset menu settings to defaults
           </button>
-        </Card>
-        <Card title="Pending Tasks" eyebrow="Setup">
-          <ul className="space-y-2 text-sm font-semibold text-slate-200">
-            <li>Calibrate depth offset with loaded fuel/water profile</li>
-            <li>Bind physical brightness knob input</li>
-            <li>Connect autopilot sentence bridge</li>
-            <li>Export settings profile to backup USB</li>
-          </ul>
         </Card>
       </aside>
     </section>

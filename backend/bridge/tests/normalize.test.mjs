@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultSourceState, normalizeSignalKDelta } from '../normalize.mjs';
+import { defaultSourceState, normalizeMqttMessage, normalizeSignalKDelta } from '../normalize.mjs';
 
 test('normalizeSignalKDelta maps key navigation values', () => {
   const input = {
@@ -90,4 +90,29 @@ test('defaultSourceState initializes all bridge inputs as disconnected', () => {
   assert.equal(state.signalk.connected, false);
   assert.equal(state.mqtt.connected, false);
   assert.equal(state.nodered.connected, false);
+});
+
+test('normalizeSignalKDelta maps autopilot state path', () => {
+  const patch = normalizeSignalKDelta({
+    updates: [{ values: [{ path: 'steering.autopilot.state', value: 'TRACK' }] }],
+  });
+  assert.equal(patch.autopilot.state, 'track');
+});
+
+test('normalizeSignalKDelta maps bilge floodDetected', () => {
+  const wet = normalizeSignalKDelta({
+    updates: [{ values: [{ path: 'environment.inside.bilge.floodDetected', value: true }] }],
+  });
+  assert.equal(wet.bilge.alarm, true);
+  const dry = normalizeSignalKDelta({
+    updates: [{ values: [{ path: 'environment.inside.bilge.floodDetected', value: false }] }],
+  });
+  assert.equal(dry.bilge.alarm, false);
+});
+
+test('normalizeMqttMessage maps brightness and autopilot topics', () => {
+  assert.equal(normalizeMqttMessage('helmui/kiosk/brightness', '90').ui.brightness, 90);
+  assert.equal(normalizeMqttMessage('helmui/kiosk/brightness', '12').ui.brightness, 35);
+  assert.equal(normalizeMqttMessage('helmui/autopilot/state', 'AUTO').patch.autopilot.state, 'auto');
+  assert.equal(normalizeMqttMessage('helmui/autopilot/heading', '370').patch.autopilot.headingTarget, 10);
 });

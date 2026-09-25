@@ -1,5 +1,6 @@
 import type { BoatData } from '../../data/boatData';
 import type { UiSettings } from '../../store/boatStore';
+import { displayedDepthFt } from '../../utils/depth';
 import {
   engineThresholds,
   getAisSafetyState,
@@ -24,13 +25,14 @@ export function evaluateAlarms(input: {
   const alarms: AlarmItem[] = [];
   const now = Date.now();
 
-  if (data.depth.belowTransducerFt !== null) {
-    const depthSafety = getDepthSafetyState(data.depth.belowTransducerFt, settings.depthWarningFt);
+  const depthFt = displayedDepthFt(data.depth.belowTransducerFt, settings.depthOffsetFt ?? 0);
+  if (depthFt !== null) {
+    const depthSafety = getDepthSafetyState(depthFt, settings.depthWarningFt);
     if (depthSafety !== 'safe') {
       alarms.push({
         id: `depth-${depthSafety}`,
         severity: depthSafety,
-        message: `${depthSafety === 'danger' ? 'Critical' : 'Low'} depth ${data.depth.belowTransducerFt.toFixed(1)} ft`,
+        message: `${depthSafety === 'danger' ? 'Critical' : 'Low'} depth ${depthFt.toFixed(1)} ft`,
       });
     }
   }

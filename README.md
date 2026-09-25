@@ -28,6 +28,14 @@ Run the development server:
 npm run dev
 ```
 
+Run the test suite:
+
+```bash
+npm test
+npm run smoke:bridge
+npm run smoke:replay
+```
+
 Build production assets:
 
 ```bash
@@ -60,6 +68,22 @@ telemetry fills them in.
 
 - `staging-live`: direct Signal K WebSocket connection
 - `production-live`: requires the bridge transport (Signal K + MQTT + Node-RED)
+
+### Bench replay (no vessel)
+
+Replay feeds the same normalize path as live Signal K/MQTT. The UI stays live-data-only; unknown values still render as `--` until the fixture emits them.
+
+```bash
+npm run bridge:replay
+```
+
+Then start HelmUI against the bridge as in production-live above. The bundled fixture (`backend/bridge/fixtures/bench-pass.json`) loops own-ship position, a nearby AIS contact, autopilot state, brightness, a shallow-depth alarm, and a bilge flood/recover cycle.
+
+```bash
+BRIDGE_REPLAY_FILE=backend/bridge/fixtures/bench-pass.json \
+BRIDGE_REPLAY_LOOP=false \
+npm run bridge
+```
 
 ### Signal K direct (staging)
 
