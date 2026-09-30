@@ -50,85 +50,105 @@ export function AutopilotControl() {
   const btn =
     'rounded-xl border px-3 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40';
   const neutralBtn = `${btn} border-slate-600/70 bg-slate-900/60 text-slate-100 hover:border-cyan-300/60`;
+  const sectionLabel = 'mb-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-slate-500';
 
   return (
-    <Card title="Autopilot" eyebrow="Pilot" tone={engagedTone} className="flex flex-col gap-3">
+    <Card title="Autopilot" eyebrow="Pilot" tone={engagedTone} className="flex shrink-0 flex-col gap-3">
       <div className="flex items-center gap-3">
         <Navigation2 className={`h-7 w-7 shrink-0 ${engaged ? 'text-cyan-200' : 'text-slate-400'}`} />
         <div className="min-w-0 flex-1">
-          <div className="text-2xl font-bold capitalize text-white">{autopilot.state ?? '—'}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold capitalize text-white">{autopilot.state ?? '—'}</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider ${
+                engaged ? 'bg-cyan-500/20 text-cyan-200' : 'bg-slate-700/60 text-slate-300'
+              }`}
+            >
+              {engaged ? 'Engaged' : 'Standby'}
+            </span>
+          </div>
           <div className="text-sm text-slate-300">
             Target {formatDegrees(autopilot.headingTarget)} · Heading {formatDegrees(headingTrue)}
             {deviation !== null && (
-              <span className="text-cyan-200"> · {deviation > 0 ? 'Δ+' : 'Δ'}{Math.round(deviation)}°</span>
+              <span className="text-cyan-200"> · Δ{deviation > 0 ? '+' : ''}{Math.round(deviation)}°</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Engage / mode selection */}
-      <div className="grid grid-cols-4 gap-2">
-        {ENGAGE_MODES.map((mode) => {
-          const active = engaged && autopilot.state?.toLowerCase() === mode;
-          return (
-            <button
-              key={mode}
-              type="button"
-              disabled={disabled}
-              onClick={() => request({ kind: 'setState', state: mode }, `Engage ${ENGAGE_MODE_LABELS[mode]} mode`)}
-              className={`${btn} ${
-                active
-                  ? 'border-cyan-300 bg-cyan-500/20 text-cyan-100'
-                  : 'border-slate-600/70 bg-slate-900/60 text-slate-100 hover:border-cyan-300/60'
-              }`}
-            >
-              {ENGAGE_MODE_LABELS[mode]}
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          disabled={disabled || !engaged}
-          onClick={() => request({ kind: 'setState', state: 'standby' }, 'Disengage (Standby)')}
-          className={`${btn} flex items-center justify-center gap-1 border-red-400/60 bg-red-500/15 text-red-200 hover:bg-red-500/25`}
-        >
-          <Power className="h-4 w-4" /> Std
-        </button>
+      {/* Mode selection */}
+      <div>
+        <div className={sectionLabel}>Mode</div>
+        <div className="grid grid-cols-3 gap-2">
+          {ENGAGE_MODES.map((mode) => {
+            const active = engaged && autopilot.state?.toLowerCase() === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                disabled={disabled}
+                onClick={() => request({ kind: 'setState', state: mode }, `Engage ${ENGAGE_MODE_LABELS[mode]} mode`)}
+                className={`${btn} ${
+                  active
+                    ? 'border-cyan-300 bg-cyan-500/20 text-cyan-100'
+                    : 'border-slate-600/70 bg-slate-900/60 text-slate-100 hover:border-cyan-300/60'
+                }`}
+              >
+                {ENGAGE_MODE_LABELS[mode]}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
+      <button
+        type="button"
+        disabled={disabled || !engaged}
+        onClick={() => request({ kind: 'setState', state: 'standby' }, 'Disengage (Standby)')}
+        className={`${btn} flex items-center justify-center gap-2 border-red-400/60 bg-red-500/15 text-red-200 hover:bg-red-500/25`}
+      >
+        <Power className="h-4 w-4" /> Disengage (Standby)
+      </button>
+
       {/* Heading trim */}
-      <div className="grid grid-cols-4 gap-2">
-        {HEADING_NUDGES_DEGREES.map((delta) => (
-          <button
-            key={delta}
-            type="button"
-            disabled={disabled || !engaged}
-            onClick={() => request({ kind: 'adjustHeading', deltaDegrees: delta }, trimLabel(delta))}
-            className={neutralBtn}
-          >
-            {trimLabel(delta)}
-          </button>
-        ))}
+      <div>
+        <div className={sectionLabel}>Trim heading</div>
+        <div className="grid grid-cols-4 gap-2">
+          {HEADING_NUDGES_DEGREES.map((delta) => (
+            <button
+              key={delta}
+              type="button"
+              disabled={disabled || !engaged}
+              onClick={() => request({ kind: 'adjustHeading', deltaDegrees: delta }, trimLabel(delta))}
+              className={neutralBtn}
+            >
+              {trimLabel(delta)}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tack */}
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          disabled={disabled || !engaged}
-          onClick={() => request({ kind: 'tack', direction: 'port' }, 'Tack to port')}
-          className={neutralBtn}
-        >
-          ◀ Tack Port
-        </button>
-        <button
-          type="button"
-          disabled={disabled || !engaged}
-          onClick={() => request({ kind: 'tack', direction: 'starboard' }, 'Tack to starboard')}
-          className={neutralBtn}
-        >
-          Tack Stbd ▶
-        </button>
+      <div>
+        <div className={sectionLabel}>Tack</div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            disabled={disabled || !engaged}
+            onClick={() => request({ kind: 'tack', direction: 'port' }, 'Tack to port')}
+            className={neutralBtn}
+          >
+            ◀ Port
+          </button>
+          <button
+            type="button"
+            disabled={disabled || !engaged}
+            onClick={() => request({ kind: 'tack', direction: 'starboard' }, 'Tack to starboard')}
+            className={neutralBtn}
+          >
+            Starboard ▶
+          </button>
+        </div>
       </div>
 
       {/* Status / confirm / replay notice */}

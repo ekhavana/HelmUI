@@ -16,6 +16,7 @@ It is **not** a replacement for OpenPlotter, Signal K, OpenCPN, Node-RED, MQTT, 
 
 - [Why HelmUI](#why-helmui)
 - [Screens](#screens)
+- [Autopilot & route control](#autopilot--route-control)
 - [In-app customization](#in-app-customization)
 - [How it fits your boat (architecture)](#how-it-fits-your-boat-architecture)
 - [Safety-first design](#safety-first-design)
@@ -51,7 +52,7 @@ The default cockpit view: speed, heading, water temperature, wind, batteries, bi
 ![Helm screen](docs/screenshots/helm.png)
 
 ### Chart
-A larger nautical chart with route, vessel motion, and an AIS contact list. The chart layer is selectable (see [customization](#in-app-customization)) and falls back gracefully to a readable street base wherever chart coverage is missing.
+A larger nautical chart that draws your **active route** — the current leg, a dashed course-to-steer to the next waypoint, and waypoint markers — alongside vessel motion and a live AIS contact list. The chart layer is selectable (see [customization](#in-app-customization)) and falls back gracefully to a readable street base wherever chart coverage is missing. It is also where you drive the autopilot and route (see [Autopilot & route control](#autopilot--route-control)).
 
 ![Chart screen](docs/screenshots/chart.png)
 
@@ -79,6 +80,23 @@ An optional, context-aware co-pilot pane for plain-language summaries ("summariz
 Display brightness and theme, data-source health, safety thresholds (depth warning, depth offset, anchor radius), kiosk options, chart and connectivity settings, and settings backup/restore.
 
 ![Settings screen](docs/screenshots/settings.png)
+
+---
+
+## Autopilot & route control
+
+From the Chart screen you can command a Signal K / Pypilot-style autopilot directly — with guard rails built in:
+
+- **Engage a mode** — Compass (heading hold), Wind, or Route.
+- **Trim the target heading** — ±1° for fine corrections, ±10° for larger ones.
+- **Tack** to port or starboard, and **Disengage** to Standby at any time.
+- **Advance to the next waypoint** from the Route panel.
+
+Engaging, disengaging, tacking, and skipping a waypoint always ask for a **one-tap confirmation** first; small heading trims apply immediately; and **every control is disabled in replay mode** so recorded telemetry can never command real hardware. Each command's result (or failure) is shown right on the panel.
+
+Commands travel over whichever transport is active: a **Signal K `PUT`** in the direct profile, or a **`POST /command`** to the bridge — which republishes to MQTT as `helmui/autopilot/command/<action>` — in the production profile, ready for Node-RED or the Signal K autopilot plugin to act on.
+
+![Autopilot control panel](docs/screenshots/autopilot-control.png)
 
 ---
 
@@ -150,6 +168,7 @@ Only `mode`, UI settings, saved dashboards, and the anchor radius are persisted 
 - **Honest source status.** The status bar and Systems screen show each source as `online`, `down`, or `n/a` — never a green light for a source that is silent.
 - **Replay is clearly marked.** A benchtop **replay** mode can loop a fixture for demos and CI, but it is surfaced end-to-end (banner + `Data: replay` + `signalk:replay`) so replayed data can never be mistaken for a live vessel.
 - **Persistent alarms.** Depth, bilge flood, anchor drift, and source-disconnect conditions are evaluated on a fixed cadence even if the stream goes quiet.
+- **Guarded controls.** Autopilot commands that change how the boat steers — engage, disengage, tack, and waypoint skip — require an explicit confirmation, and every control is disabled in replay mode so recorded data can never command hardware.
 
 ---
 
@@ -262,6 +281,7 @@ HelmUI is configured with Vite env vars (build/runtime) and the bridge with `BRI
 | `BRIDGE_MQTT_URL` | MQTT broker URL | `mqtt://127.0.0.1:1883` |
 | `BRIDGE_MQTT_BRIGHTNESS_TOPIC` | Physical brightness knob topic | `helmui/kiosk/brightness` |
 | `BRIDGE_MQTT_AUTOPILOT_STATE_TOPIC` | Autopilot state topic | `helmui/autopilot/state` |
+| `BRIDGE_MQTT_AUTOPILOT_COMMAND_PREFIX` | Prefix for outbound autopilot commands (`<prefix>/{state,heading,adjust,tack,advance}`) | `helmui/autopilot/command` |
 | `BRIDGE_REPLAY_FILE` | Loop a fixture instead of live sources (**never on the boat**) | `backend/bridge/fixtures/bench-pass.json` |
 
 ---
@@ -298,6 +318,7 @@ The bridge exposes:
 - `GET /sources` — source connectivity summary
 - `GET /last-seen` — last normalized patch metadata
 - `WS /ws` — canonical telemetry stream (`snapshot`, `delta`, `health`)
+- `POST /command` — outbound autopilot commands (`{ "type": "state|heading|adjust|tack|advance", "value": … }`), republished to MQTT. Refused in replay mode.
 
 Pre-departure smoke check:
 
@@ -316,7 +337,7 @@ HelmUI is an actively developed MVP. On the near-term list:
 - Drag-and-drop tile moving (in addition to the current move buttons)
 - Live endpoint reconnection without a reload
 - More instrument tiles and per-tile configuration
-- Deeper autopilot and route interaction
+- Full multi-leg route resources on the chart (building on the current active-leg rendering)
 
 Ideas and requests are very welcome — see below.
 

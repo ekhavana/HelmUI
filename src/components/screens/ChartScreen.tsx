@@ -230,7 +230,7 @@ export function ChartScreen() {
       </div>
 
       <aside className="flex min-h-0 flex-col gap-4">
-        <Card title="AIS Contacts" eyebrow="Traffic" tone={ais.riskLevel === 'danger' ? 'danger' : ais.riskLevel === 'warning' ? 'warning' : 'safe'}>
+        <Card title="AIS Contacts" eyebrow="Traffic" className="flex min-h-0 flex-1 flex-col" tone={ais.riskLevel === 'danger' ? 'danger' : ais.riskLevel === 'warning' ? 'warning' : 'safe'}>
           <div className="flex items-center justify-between">
             <div>
               <div className="text-4xl font-bold text-white">{ais.targets}</div>
