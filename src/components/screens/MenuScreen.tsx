@@ -4,6 +4,7 @@ import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { displayedDepthFt } from '../../utils/depth';
 import { formatNumber } from '../../utils/formatters';
+import { sourceStatusClass, sourceStatusLabel } from '../../utils/sourceStatus';
 import { Card } from '../ui/Card';
 
 export function MenuScreen() {
@@ -11,6 +12,7 @@ export function MenuScreen() {
   const depth = useBoatStore((state) => state.data.depth);
   const anchor = useBoatStore((state) => state.data.anchor);
   const sourceHealth = useBoatStore((state) => state.sourceHealth);
+  const telemetryMode = useBoatStore((state) => state.telemetryMode);
   const settings = useBoatStore((state) => state.settings);
   const updateSettings = useBoatStore((state) => state.updateSettings);
   const resetSettings = useBoatStore((state) => state.resetSettings);
@@ -92,15 +94,15 @@ export function MenuScreen() {
           <div className="space-y-3 text-sm font-semibold text-slate-200">
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><Radio className="h-4 w-4 text-cyan-200" /> Signal K</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceHealth.signalk.connected ? 'bg-emerald-500/20 text-emerald-200' : signalKState === 'disabled' ? 'bg-slate-700/40 text-slate-300' : 'bg-red-500/20 text-red-200'}`}>{signalKState === 'disabled' ? 'off' : sourceHealth.signalk.connected ? 'online' : 'down'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${signalKState === 'disabled' ? 'bg-slate-700/40 text-slate-300' : sourceStatusClass(sourceHealth.signalk.connected, telemetryMode)}`}>{signalKState === 'disabled' ? 'off' : sourceStatusLabel(sourceHealth.signalk.connected, telemetryMode)}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><Wifi className="h-4 w-4 text-cyan-200" /> MQTT</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'online' : 'down') : 'n/a'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceStatusClass(sourceHealth.mqtt.connected, telemetryMode, activeSources.includes('mqtt'))}`}>{sourceStatusLabel(sourceHealth.mqtt.connected, telemetryMode, activeSources.includes('mqtt'))}</span>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2">
               <span className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-cyan-200" /> Node-RED</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'online' : 'down') : 'n/a'}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs uppercase ${sourceStatusClass(sourceHealth.nodered.connected, telemetryMode, activeSources.includes('nodered'))}`}>{sourceStatusLabel(sourceHealth.nodered.connected, telemetryMode, activeSources.includes('nodered'))}</span>
             </div>
             <div className="text-xs text-slate-400">AP: steering.autopilot.* or MQTT helmui/autopilot/state|heading</div>
           </div>

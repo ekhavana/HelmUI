@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { runtimeConfig } from '../config/runtime';
 import { emptyBoatData, type BoatData } from '../data/boatData';
 import { mergeAisContacts, summarizeAis } from '../domain/ais/aggregateAis';
-import type { BridgeMessage, BridgeSourceName, BridgeSourceState } from '../bridge/types';
+import type { BridgeMessage, BridgeSourceName, BridgeSourceState, TelemetryMode } from '../bridge/types';
 import { evaluateAlarms } from '../domain/alarms/evaluateAlarms';
 import { isHelmSettingsProfile, SETTINGS_PROFILE_VERSION, type HelmSettingsProfile } from '../domain/settings/profile';
 import type { AlarmItem } from '../domain/alarms/types';
@@ -36,6 +36,7 @@ interface BoatStore {
   aiMessages: AssistantMessage[];
   signalKState: SignalKConnectionState;
   sourceHealth: Record<BridgeSourceName, BridgeSourceState>;
+  telemetryMode: TelemetryMode;
   telemetryUpdatedAt: string | null;
   alarms: AlarmItem[];
   setMode: (mode: AppMode) => void;
@@ -141,6 +142,7 @@ export const useBoatStore = create<BoatStore>()(
       aiMessages: defaultAiMessages,
       signalKState: 'disabled',
       sourceHealth: defaultSourceHealth,
+      telemetryMode: 'live' as TelemetryMode,
       telemetryUpdatedAt: null as string | null,
       alarms: [] as AlarmItem[],
       setMode: (mode) => set({ mode }),
@@ -261,6 +263,7 @@ export const useBoatStore = create<BoatStore>()(
             data: nextData,
             settings,
             sourceHealth,
+            telemetryMode: message.mode ?? 'live',
             telemetryUpdatedAt: message.timestamp ?? new Date().toISOString(),
             alarms,
           };
@@ -370,6 +373,7 @@ export const useBoatStore = create<BoatStore>()(
           },
           aiMessages: persisted.aiMessages?.length ? persisted.aiMessages : currentState.aiMessages,
           sourceHealth: currentState.sourceHealth,
+          telemetryMode: currentState.telemetryMode,
           telemetryUpdatedAt: currentState.telemetryUpdatedAt,
           alarms: currentState.alarms,
           data: {

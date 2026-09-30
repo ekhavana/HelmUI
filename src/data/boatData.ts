@@ -8,8 +8,6 @@ import type { AisContacts } from '../domain/ais/types';
 export const emptyBoatData = {
   depth: {
     belowTransducerFt: null as number | null,
-    trend: 'stable',
-    status: 'safe',
   },
   speed: {
     sogKts: null as number | null,
@@ -18,8 +16,8 @@ export const emptyBoatData = {
   navigation: {
     headingTrue: null as number | null,
     cogTrue: null as number | null,
-    gpsFix: 'NO FIX',
-    satellites: 0,
+    gpsFix: null as string | null,
+    satellites: null as number | null,
     latitude: null as number | null,
     longitude: null as number | null,
   },
@@ -66,7 +64,7 @@ export const emptyBoatData = {
   power: {
     solarWatts: null as number | null,
     loadWatts: null as number | null,
-    inverterOn: false,
+    inverterOn: null as boolean | null,
   },
   network: {
     signalK: 'unknown',

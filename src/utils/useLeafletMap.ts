@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef } from 'react';
-import { runtimeConfig } from '../config/runtime';
+import { CHART_LAYERS, runtimeConfig } from '../config/runtime';
 
 export interface LeafletMapOptions {
   zoom?: number;
@@ -23,20 +23,32 @@ export function useLeafletMap(options: LeafletMapOptions = {}) {
       attributionControl: false,
     });
 
-    const { offlineOnly, tileUrlTemplate } = runtimeConfig.chart;
-    const baseTemplate =
-      tileUrlTemplate || (offlineOnly ? '/tiles/base.svg' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    const { offlineOnly, tileUrlTemplate, layer, seamarks } = runtimeConfig.chart;
 
-    L.tileLayer(baseTemplate, {
-      maxZoom: 19,
-      opacity: 0.85,
-    }).addTo(map);
-
-    if (!offlineOnly) {
-      L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        opacity: 0.9,
+    if (offlineOnly) {
+      L.tileLayer(tileUrlTemplate || '/tiles/base.svg', { maxZoom: 19 }).addTo(map);
+    } else {
+      // Street base stays underneath at full opacity so the chart degrades to a
+      // readable map wherever chart tiles have no coverage or fail to load.
+      L.tileLayer(tileUrlTemplate || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
       }).addTo(map);
+
+      for (const tile of CHART_LAYERS[layer].tiles) {
+        L.tileLayer(tile.url, {
+          maxZoom: tile.maxZoom ?? 19,
+          maxNativeZoom: tile.maxNativeZoom,
+          opacity: tile.opacity ?? 1,
+        }).addTo(map);
+      }
+
+      if (seamarks) {
+        L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          maxNativeZoom: 18,
+          opacity: 0.9,
+        }).addTo(map);
+      }
     }
 
     mapRef.current = map;

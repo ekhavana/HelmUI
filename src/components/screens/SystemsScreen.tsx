@@ -2,6 +2,7 @@ import { Cpu, Droplets, PlugZap, Radio, Server, Waves } from 'lucide-react';
 import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { formatAmps, formatNumber, formatVoltage } from '../../utils/formatters';
+import { sourceStatusClass, sourceStatusLabel } from '../../utils/sourceStatus';
 import { Card } from '../ui/Card';
 import { Gauge } from '../ui/Gauge';
 
@@ -12,6 +13,7 @@ export function SystemsScreen() {
   const power = useBoatStore((state) => state.data.power);
   const network = useBoatStore((state) => state.data.network);
   const sourceHealth = useBoatStore((state) => state.sourceHealth);
+  const telemetryMode = useBoatStore((state) => state.telemetryMode);
   const activeSources = runtimeConfig.telemetry.activeSources;
 
   return (
@@ -36,7 +38,7 @@ export function SystemsScreen() {
               </div>
               <PlugZap className="h-8 w-8 text-cyan-200/85" />
             </div>
-            <div className="mt-2 text-sm font-semibold text-slate-300">Load {formatNumber(power.loadWatts, 0)} W · Inverter {power.inverterOn ? 'ON' : 'OFF'}</div>
+            <div className="mt-2 text-sm font-semibold text-slate-300">Load {formatNumber(power.loadWatts, 0)} W · Inverter {power.inverterOn === null ? '--' : power.inverterOn ? 'ON' : 'OFF'}</div>
           </div>
         </div>
       </Card>
@@ -64,15 +66,15 @@ export function SystemsScreen() {
         <div className="space-y-3">
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Radio className="h-4 w-4 text-cyan-200" /> Signal K</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceHealth.signalk.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200'}`}>{sourceHealth.signalk.connected ? 'online' : 'down'}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceStatusClass(sourceHealth.signalk.connected, telemetryMode)}`}>{sourceStatusLabel(sourceHealth.signalk.connected, telemetryMode)}</span>
           </div>
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Server className="h-4 w-4 text-cyan-200" /> MQTT Broker</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('mqtt') ? (sourceHealth.mqtt.connected ? 'online' : 'down') : 'n/a'}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceStatusClass(sourceHealth.mqtt.connected, telemetryMode, activeSources.includes('mqtt'))}`}>{sourceStatusLabel(sourceHealth.mqtt.connected, telemetryMode, activeSources.includes('mqtt'))}</span>
           </div>
           <div className="flex items-center justify-between rounded-2xl bg-slate-950/45 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Cpu className="h-4 w-4 text-cyan-200" /> Node-RED</div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'bg-emerald-500/20 text-emerald-200' : 'bg-red-500/20 text-red-200') : 'bg-slate-700/40 text-slate-300'}`}>{activeSources.includes('nodered') ? (sourceHealth.nodered.connected ? 'online' : 'down') : 'n/a'}</span>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${sourceStatusClass(sourceHealth.nodered.connected, telemetryMode, activeSources.includes('nodered'))}`}>{sourceStatusLabel(sourceHealth.nodered.connected, telemetryMode, activeSources.includes('nodered'))}</span>
           </div>
           <div className="rounded-2xl bg-slate-950/45 p-3 text-xs font-semibold text-slate-300">Last Node-RED seen: {sourceHealth.nodered.lastSeen ?? network.nodered}</div>
         </div>

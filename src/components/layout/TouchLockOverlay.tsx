@@ -54,7 +54,7 @@ export function TouchLockOverlay() {
 
   return (
     <div
-      className="absolute inset-0 z-50 flex touch-none flex-col items-center justify-center bg-slate-950/80 backdrop-blur-[2px]"
+      className="absolute inset-0 z-[1500] flex touch-none flex-col items-center justify-center bg-slate-950/80 backdrop-blur-[2px]"
       onContextMenu={(event) => event.preventDefault()}
     >
       <Lock className="mb-4 h-16 w-16 text-amber-200" />

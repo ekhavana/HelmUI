@@ -17,6 +17,8 @@ const MQTT_BRIGHTNESS_TOPIC = process.env.BRIDGE_MQTT_BRIGHTNESS_TOPIC ?? 'helmu
 const MQTT_AUTOPILOT_STATE_TOPIC = process.env.BRIDGE_MQTT_AUTOPILOT_STATE_TOPIC ?? 'helmui/autopilot/state';
 const MQTT_AUTOPILOT_HEADING_TOPIC = process.env.BRIDGE_MQTT_AUTOPILOT_HEADING_TOPIC ?? 'helmui/autopilot/heading';
 const REPLAY_FILE = process.env.BRIDGE_REPLAY_FILE ?? '';
+// Replayed telemetry must never be presentable as a live vessel feed.
+const MODE = REPLAY_FILE ? 'replay' : 'live';
 const __dirname = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const TILES_ROOT = resolve(join(__dirname, 'tiles'));
 
@@ -58,19 +60,19 @@ const server = createServer((req, res) => {
 
   if (req.url === '/health') {
     res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, timestamp: new Date().toISOString(), sources: sourceState }));
+    res.end(JSON.stringify({ ok: true, mode: MODE, timestamp: new Date().toISOString(), sources: sourceState }));
     return;
   }
 
   if (req.url === '/sources') {
     res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify(sourceState));
+    res.end(JSON.stringify({ mode: MODE, sources: sourceState }));
     return;
   }
 
   if (req.url === '/last-seen') {
     res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ timestamp: new Date().toISOString(), sources: sourceState, patch: lastPatch }));
+    res.end(JSON.stringify({ mode: MODE, timestamp: new Date().toISOString(), sources: sourceState, patch: lastPatch }));
     return;
   }
 
@@ -89,7 +91,7 @@ function broadcast(payload) {
 }
 
 function emitHealth() {
-  broadcast({ type: 'health', timestamp: new Date().toISOString(), sources: sourceState });
+  broadcast({ type: 'health', mode: MODE, timestamp: new Date().toISOString(), sources: sourceState });
 }
 
 function mergeLastPatch(patch) {
@@ -111,6 +113,7 @@ function emitDelta(patch, ui) {
   if (ui && Object.keys(ui).length > 0) Object.assign(lastUi, ui);
   broadcast({
     type: 'delta',
+    mode: MODE,
     timestamp: new Date().toISOString(),
     patch: patch ?? {},
     ui: Object.keys(lastUi).length > 0 ? lastUi : undefined,
@@ -242,6 +245,7 @@ wss.on('connection', (socket) => {
   socket.send(
     JSON.stringify({
       type: 'snapshot',
+      mode: MODE,
       timestamp: new Date().toISOString(),
       data: lastPatch,
       ui: Object.keys(lastUi).length > 0 ? lastUi : undefined,

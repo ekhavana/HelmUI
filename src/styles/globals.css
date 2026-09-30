@@ -35,3 +35,27 @@ body {
 button {
   font: inherit;
 }
+
+/* Map overlays sit on bright chart tiles, so they need solid backing to stay
+   readable in daylight rather than the translucent panels used elsewhere. */
+.map-chip {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(103, 232, 249, 0.55);
+  background: rgba(2, 6, 23, 0.94);
+  padding: 0.5rem 0.75rem;
+  color: #ecfeff;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.75);
+}
+
+.leaflet-tooltip {
+  border: 1px solid rgba(251, 146, 60, 0.75) !important;
+  background: rgba(2, 6, 23, 0.94) !important;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.75) !important;
+  color: #ffedd5 !important;
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: rgba(251, 146, 60, 0.75) !important;
+}

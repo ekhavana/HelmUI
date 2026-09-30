@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import { Navigation, Ship } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
+import { runtimeConfig } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { formatCardinal, formatDegrees, formatKts, formatNumber } from '../../utils/formatters';
 import { useAisMarkers } from '../../utils/useAisMarkers';
@@ -84,16 +85,16 @@ export function ChartScreen() {
       <div className="relative min-h-0 overflow-hidden rounded-[2rem] border border-cyan-300/20">
         <div ref={mapContainerRef} className="absolute inset-0" />
         {!hasPosition && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 z-[1100] flex items-center justify-center">
             <div className="rounded-2xl border border-cyan-300/30 bg-slate-950/80 px-6 py-3 text-sm font-semibold text-cyan-200">
               Waiting for GPS fix…
             </div>
           </div>
         )}
-        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-cyan-100">
-          <div className="text-xs uppercase tracking-widest text-slate-400">Live Chart</div>
-          <span className="text-slate-500">·</span>
-          <div className="text-sm font-semibold">OSM + OpenSeaMap</div>
+        <div className="map-chip pointer-events-none absolute right-4 top-4 z-[1100] flex items-center gap-2">
+          <div className="text-xs uppercase tracking-widest text-slate-300">Live Chart</div>
+          <span className="text-slate-400">·</span>
+          <div className="text-sm font-semibold">{runtimeConfig.chart.label}</div>
         </div>
       </div>
 

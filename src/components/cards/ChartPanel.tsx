@@ -50,27 +50,27 @@ export function ChartPanel() {
       <div ref={mapContainerRef} className="absolute inset-0" />
 
       {!hasPosition && (
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 z-[1100] flex items-center justify-center">
           <div className="rounded-2xl border border-cyan-300/30 bg-slate-950/80 px-6 py-3 text-sm font-semibold text-cyan-200">
             Waiting for GPS fix…
           </div>
         </div>
       )}
 
-      <div className="pointer-events-none absolute left-5 top-5 z-10 flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-cyan-100">
-        <div className="text-xs uppercase tracking-widest text-slate-400">HDG</div>
+      <div className="map-chip pointer-events-none absolute left-5 top-5 z-[1100] flex items-center gap-2">
+        <div className="text-xs uppercase tracking-widest text-slate-300">HDG</div>
         <div className="text-base font-bold">{formatDegrees(navigation.headingTrue)}</div>
-        <span className="text-slate-500">·</span>
-        <div className="text-xs uppercase tracking-widest text-slate-400">COG</div>
+        <span className="text-slate-400">·</span>
+        <div className="text-xs uppercase tracking-widest text-slate-300">COG</div>
         <div className="text-base font-bold">{formatDegrees(navigation.cogTrue)}</div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-5 left-5 z-10 flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-cyan-100">
+      <div className="map-chip pointer-events-none absolute bottom-5 left-5 z-[1100] flex items-center gap-2">
         <Navigation className="h-4 w-4 text-cyan-300" />
         <div className="text-sm font-semibold">{formatNumber(route.distanceNm)} nm · {route.nextWaypoint}</div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-5 right-5 z-10 flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-cyan-100">
+      <div className="map-chip pointer-events-none absolute bottom-5 right-5 z-[1100] flex items-center gap-2">
         <Ship className="h-4 w-4 text-cyan-300" />
         <div className="text-sm font-semibold">AIS {ais.targets} · {formatNumber(ais.closestNm)} nm</div>
       </div>

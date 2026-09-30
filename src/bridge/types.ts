@@ -2,6 +2,8 @@ import type { BoatData } from '../data/boatData';
 
 export type BridgeSourceName = 'signalk' | 'mqtt' | 'nodered';
 
+export type TelemetryMode = 'live' | 'replay';
+
 export interface BridgeSourceState {
   connected: boolean;
   lastSeen: string | null;
@@ -10,6 +12,7 @@ export interface BridgeSourceState {
 
 export interface BridgeSnapshotMessage {
   type: 'snapshot';
+  mode?: TelemetryMode;
   timestamp: string;
   data: Partial<BoatData>;
   ui?: { brightness?: number };
@@ -18,6 +21,7 @@ export interface BridgeSnapshotMessage {
 
 export interface BridgeDeltaMessage {
   type: 'delta';
+  mode?: TelemetryMode;
   timestamp: string;
   patch: Partial<BoatData>;
   ui?: { brightness?: number };
@@ -26,6 +30,7 @@ export interface BridgeDeltaMessage {
 
 export interface BridgeHealthMessage {
   type: 'health';
+  mode?: TelemetryMode;
   timestamp: string;
   sources: Record<BridgeSourceName, BridgeSourceState>;
 }

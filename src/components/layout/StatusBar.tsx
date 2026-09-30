@@ -14,6 +14,7 @@ export function StatusBar() {
   const signalKState = useBoatStore((state) => state.signalKState);
   const alarms = useBoatStore((state) => state.alarms);
   const sourceHealth = useBoatStore((state) => state.sourceHealth);
+  const telemetryMode = useBoatStore((state) => state.telemetryMode);
   const overlayOpen = useLogStore((state) => state.overlayOpen);
   const toggleLog = useLogStore((state) => state.toggleLog);
 
@@ -24,7 +25,7 @@ export function StatusBar() {
   const alarmSummary = alarms.find((item) => item.severity === 'danger') ?? alarms[0];
   const sourceSummary = Object.entries(sourceHealth)
     .filter(([name]) => runtimeConfig.telemetry.activeSources.includes(name as BridgeSourceName))
-    .map(([name, source]) => `${name}:${source.connected ? 'up' : 'down'}`)
+    .map(([name, source]) => `${name}:${source.connected ? (telemetryMode === 'replay' ? 'replay' : 'up') : 'down'}`)
     .join(' ');
 
   return (
@@ -33,8 +34,8 @@ export function StatusBar() {
       <div className="flex items-center gap-2"><Sunset className="h-5 w-5 text-amber-200" /> Sunset: {sunsetCountdown}</div>
       <div className="flex items-center gap-2"><Flag className="h-5 w-5 text-cyan-200" /> Next WP: {route.nextWaypoint}</div>
       <div className="flex items-center gap-2"><Clock className="h-5 w-5 text-cyan-200" /> ETA: {computeEta(route.distanceNm ?? 0, sogKts ?? 0)}</div>
-      <div className="text-cyan-100">Data: {signalKState === 'disabled' ? 'Off' : signalKState}</div>
-      <div className="text-[11px] text-slate-300">{sourceSummary}</div>
+      <div className={telemetryMode === 'replay' ? 'text-amber-200' : 'text-cyan-100'}>Data: {telemetryMode === 'replay' ? 'replay' : signalKState === 'disabled' ? 'Off' : signalKState}</div>
+      <div className={`text-[11px] ${telemetryMode === 'replay' ? 'text-amber-200/90' : 'text-slate-300'}`}>{sourceSummary}</div>
       <div className="text-right text-cyan-100">{local}</div>
       <button
         className={`flex min-h-10 items-center gap-2 rounded-xl border px-5 ${overlayOpen ? 'border-cyan-300/70 bg-cyan-400/20 text-cyan-50' : 'border-cyan-300/35 bg-cyan-400/10 text-cyan-100'}`}
