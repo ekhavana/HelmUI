@@ -1,6 +1,6 @@
-import { Download, Monitor, MoonStar, Radio, Shield, SlidersHorizontal, Sun, Upload, Wifi } from 'lucide-react';
+import { Download, Map, Monitor, MoonStar, Radio, RotateCw, Save, Shield, SlidersHorizontal, Sun, Upload, Wifi } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { runtimeConfig } from '../../config/runtime';
+import { CHART_LAYERS, runtimeConfig, type ChartLayer } from '../../config/runtime';
 import { useBoatStore } from '../../store/boatStore';
 import { displayedDepthFt } from '../../utils/depth';
 import { formatNumber } from '../../utils/formatters';
@@ -22,7 +22,18 @@ export function MenuScreen() {
   const activeSources = runtimeConfig.telemetry.activeSources;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
+  const [draftConn, setDraftConn] = useState(settings.connectivity);
+  const [connStatus, setConnStatus] = useState<string | null>(null);
   const calibratedDepth = displayedDepthFt(depth.belowTransducerFt, settings.depthOffsetFt);
+  const connDirty =
+    draftConn.signalKUrl !== settings.connectivity.signalKUrl ||
+    draftConn.bridgeWsUrl !== settings.connectivity.bridgeWsUrl ||
+    draftConn.bridgeHttpUrl !== settings.connectivity.bridgeHttpUrl;
+
+  function saveConnectivity() {
+    updateSettings({ connectivity: draftConn });
+    setConnStatus('Saved · reload to apply');
+  }
 
   function exportProfile() {
     const profile = exportSettingsProfile();
@@ -48,7 +59,7 @@ export function MenuScreen() {
 
   return (
     <section className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_420px] gap-4">
-      <div className="grid min-h-0 grid-cols-2 gap-4">
+      <div className="grid min-h-0 auto-rows-min grid-cols-2 gap-4 overflow-y-auto pr-1">
         <Card title="Display" eyebrow="Brightness + Theme" tone="active">
           <div className="space-y-3 text-sm font-semibold text-slate-200">
             <div className="flex items-center justify-between rounded-xl border border-slate-700/60 bg-slate-950/50 px-3 py-2">
@@ -156,6 +167,87 @@ export function MenuScreen() {
           <div className="space-y-2 text-sm font-semibold text-slate-200">
             <button className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left" onClick={() => updateSettings({ autoLaunch: !settings.autoLaunch })} type="button"><span>Auto-launch on boot</span><span className={settings.autoLaunch ? 'text-emerald-200' : 'text-slate-300'}>{settings.autoLaunch ? 'On' : 'Off'}</span></button>
             <button className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left" onClick={() => updateSettings({ touchLock: !settings.touchLock })} type="button"><span>Touch input lock</span><span className={settings.touchLock ? 'text-amber-200' : 'text-slate-300'}>{settings.touchLock ? 'On' : 'Off'}</span></button>
+          </div>
+        </Card>
+
+        <Card title="Chart" eyebrow="Map Layers">
+          <div className="space-y-3 text-sm font-semibold text-slate-200">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-400"><Map className="h-4 w-4 text-cyan-200" /> Chart layer</div>
+            <div className="grid grid-cols-2 gap-2">
+              {(Object.entries(CHART_LAYERS) as [ChartLayer, (typeof CHART_LAYERS)[ChartLayer]][]).map(([key, spec]) => (
+                <button
+                  className={`rounded-xl border px-3 py-2 text-left text-xs ${settings.chartLayer === key ? 'border-cyan-300/60 bg-cyan-500/20 text-cyan-100' : 'border-slate-700/60 bg-slate-950/50 text-slate-200'}`}
+                  key={key}
+                  onClick={() => updateSettings({ chartLayer: key })}
+                  type="button"
+                >
+                  {spec.label}
+                </button>
+              ))}
+            </div>
+            <button
+              className="flex w-full items-center justify-between rounded-xl bg-slate-950/50 px-3 py-2 text-left"
+              onClick={() => updateSettings({ chartSeamarks: !settings.chartSeamarks })}
+              type="button"
+            >
+              <span>OpenSeaMap seamarks</span>
+              <span className={settings.chartSeamarks ? 'text-emerald-200' : 'text-slate-300'}>{settings.chartSeamarks ? 'On' : 'Off'}</span>
+            </button>
+            <div className="text-xs text-slate-400">Applies live to every chart on the helm.</div>
+          </div>
+        </Card>
+
+        <Card title="Connectivity" eyebrow="Device Endpoints">
+          <div className="space-y-3 text-sm font-semibold text-slate-200">
+            <label className="block space-y-1">
+              <span className="text-xs uppercase tracking-[0.18em] text-slate-400">Signal K WebSocket</span>
+              <input
+                className="w-full rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2 text-xs font-medium text-cyan-100 outline-none focus:border-cyan-300/60"
+                onChange={(event) => setDraftConn({ ...draftConn, signalKUrl: event.target.value })}
+                spellCheck={false}
+                type="text"
+                value={draftConn.signalKUrl}
+              />
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs uppercase tracking-[0.18em] text-slate-400">Bridge WebSocket</span>
+              <input
+                className="w-full rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2 text-xs font-medium text-cyan-100 outline-none focus:border-cyan-300/60"
+                onChange={(event) => setDraftConn({ ...draftConn, bridgeWsUrl: event.target.value })}
+                spellCheck={false}
+                type="text"
+                value={draftConn.bridgeWsUrl}
+              />
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs uppercase tracking-[0.18em] text-slate-400">Bridge HTTP</span>
+              <input
+                className="w-full rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2 text-xs font-medium text-cyan-100 outline-none focus:border-cyan-300/60"
+                onChange={(event) => setDraftConn({ ...draftConn, bridgeHttpUrl: event.target.value })}
+                spellCheck={false}
+                type="text"
+                value={draftConn.bridgeHttpUrl}
+              />
+            </label>
+            <div className="text-xs text-slate-400">Active transport: {runtimeConfig.telemetry.transport}. Endpoints apply after reload.</div>
+            <div className="flex items-center gap-2">
+              <button
+                className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs ${connDirty ? 'border-cyan-300/45 bg-cyan-500/15 text-cyan-100' : 'border-slate-700/60 bg-slate-950/50 text-slate-400'}`}
+                disabled={!connDirty}
+                onClick={saveConnectivity}
+                type="button"
+              >
+                <Save className="h-4 w-4" /> Save
+              </button>
+              <button
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-900/70 px-3 py-2 text-xs text-slate-200"
+                onClick={() => window.location.reload()}
+                type="button"
+              >
+                <RotateCw className="h-4 w-4" /> Reload
+              </button>
+            </div>
+            {connStatus ? <div className="text-xs font-semibold text-emerald-200">{connStatus}</div> : null}
           </div>
         </Card>
       </div>

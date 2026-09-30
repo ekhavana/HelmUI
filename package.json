@@ -8,7 +8,7 @@
     "bridge:replay": "BRIDGE_REPLAY_FILE=backend/bridge/fixtures/bench-pass.json node backend/bridge/server.mjs",
     "test": "npm run test:bridge && npm run test:domain",
     "test:bridge": "node --test backend/bridge/tests/*.test.mjs",
-    "test:domain": "node --experimental-strip-types --import ./scripts/register-ts.mjs --test src/utils/depth.test.ts src/domain/ais/aggregateAis.test.ts src/domain/alarms/evaluateAlarms.test.ts src/domain/settings/profile.test.ts",
+    "test:domain": "node --experimental-strip-types --import ./scripts/register-ts.mjs --test src/utils/depth.test.ts src/domain/ais/aggregateAis.test.ts src/domain/alarms/evaluateAlarms.test.ts src/domain/settings/profile.test.ts src/domain/dashboard/layout.test.ts",
     "smoke:bridge": "node scripts/smoke-bridge.mjs",
     "smoke:replay": "node scripts/smoke-replay.mjs"
   },
