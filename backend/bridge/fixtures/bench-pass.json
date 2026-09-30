@@ -1,0 +1,79 @@
+{
+  "loop": true,
+  "loopPauseMs": 4000,
+  "events": [
+    {
+      "waitMs": 0,
+      "signalk": {
+        "context": "vessels.self",
+        "updates": [
+          {
+            "values": [
+              { "path": "navigation.position", "value": { "latitude": 38.9784, "longitude": -76.4922 } },
+              { "path": "navigation.headingTrue", "value": 1.5708 },
+              { "path": "navigation.speedOverGround", "value": 2.572 },
+              { "path": "environment.depth.belowTransducer", "value": 4.2 },
+              { "path": "steering.autopilot.mode", "value": "auto" },
+              { "path": "steering.autopilot.target.headingTrue", "value": 1.5708 },
+              { "path": "environment.inside.bilge.floodDetected", "value": false },
+              { "path": "electrical.batteries.house.voltage", "value": 12.6 },
+              { "path": "electrical.batteries.house.capacity.stateOfCharge", "value": 0.82 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "waitMs": 400,
+      "mqtt": { "topic": "helmui/kiosk/brightness", "payload": "78" }
+    },
+    {
+      "waitMs": 400,
+      "mqtt": { "topic": "helmui/autopilot/state", "payload": "auto" }
+    },
+    {
+      "waitMs": 500,
+      "signalk": {
+        "context": "vessels.urn:mrn:imo:mmsi:366123456",
+        "updates": [
+          {
+            "values": [
+              { "path": "name", "value": "PILOT BOAT" },
+              { "path": "navigation.position", "value": { "latitude": 38.984, "longitude": -76.4922 } },
+              { "path": "navigation.speedOverGround", "value": 3.0 },
+              { "path": "navigation.headingTrue", "value": 3.1416 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "waitMs": 800,
+      "signalk": {
+        "context": "vessels.self",
+        "updates": [{ "values": [{ "path": "environment.depth.belowTransducer", "value": 1.4 }] }]
+      }
+    },
+    {
+      "waitMs": 800,
+      "signalk": {
+        "context": "vessels.self",
+        "updates": [{ "values": [{ "path": "environment.inside.bilge.floodDetected", "value": true }] }]
+      }
+    },
+    {
+      "waitMs": 1200,
+      "signalk": {
+        "context": "vessels.self",
+        "updates": [
+          {
+            "values": [
+              { "path": "environment.depth.belowTransducer", "value": 4.2 },
+              { "path": "environment.inside.bilge.floodDetected", "value": false }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

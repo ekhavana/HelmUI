@@ -62,6 +62,7 @@ export function createSignalKClient({ url, onDelta, onStateChange }: SignalKClie
         'environment.wind.speedApparent',
         'environment.wind.speedTrue',
         'steering.autopilot.mode',
+        'steering.autopilot.state',
         'steering.autopilot.target.headingTrue',
         'electrical.batteries.house.voltage',
         'electrical.batteries.house.current',

@@ -22,7 +22,7 @@ export function EventLogOverlay() {
   if (!open) return null;
 
   return (
-    <div className="absolute inset-0 z-40 flex flex-col bg-slate-950/95 p-6 backdrop-blur-md">
+    <div className="absolute inset-0 z-[1400] flex flex-col bg-slate-950/95 p-6 backdrop-blur-md">
       <header className="mb-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 text-cyan-100">
           <BookOpen className="h-7 w-7" />

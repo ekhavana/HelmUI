@@ -26,23 +26,25 @@ export function EngineScreen() {
         </Card>
       </aside>
 
-      <Card className="grid grid-cols-2 gap-4" title="Engine Monitoring" eyebrow="Propulsion">
-        <div className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <div className="mb-1 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400"><Thermometer className="h-4 w-4" /> Coolant</div>
-          <div className="text-4xl font-bold text-white">{formatCelsius(engine.coolantTempC)}</div>
-          <div className="mt-2"><Gauge max={110} tone={engine.coolantTempC == null ? 'cyan' : engine.coolantTempC > 90 ? 'red' : engine.coolantTempC > 82 ? 'amber' : 'green'} value={engine.coolantTempC} /></div>
-        </div>
-        <div className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <div className="mb-1 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400"><Fuel className="h-4 w-4" /> Oil Pressure</div>
-          <div className="text-4xl font-bold text-white">{formatNumber(engine.oilPressurePsi)}<span className="text-xl text-slate-300"> psi</span></div>
-          <div className="mt-2"><Gauge max={90} tone={engine.oilPressurePsi == null ? 'cyan' : engine.oilPressurePsi < 30 ? 'red' : engine.oilPressurePsi < 40 ? 'amber' : 'green'} value={engine.oilPressurePsi} /></div>
-        </div>
-        <div className="col-span-2 rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Runtime + Charging</div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div><div className="text-xs text-slate-400">Hours</div><div className="text-2xl font-bold text-white">{formatNumber(engine.hours)}</div></div>
-            <div><div className="text-xs text-slate-400">Alternator</div><div className="text-2xl font-bold text-white">{formatVoltage(engine.alternatorVoltage)}</div></div>
-            <div><div className="text-xs text-slate-400">House</div><div className="text-2xl font-bold text-white">{formatVoltage(battery.houseVoltage)}</div></div>
+      <Card title="Engine Monitoring" eyebrow="Propulsion">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
+            <div className="mb-1 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400"><Thermometer className="h-4 w-4" /> Coolant</div>
+            <div className="text-4xl font-bold text-white">{formatCelsius(engine.coolantTempC)}</div>
+            <div className="mt-2"><Gauge max={110} tone={engine.coolantTempC == null ? 'cyan' : engine.coolantTempC > 90 ? 'red' : engine.coolantTempC > 82 ? 'amber' : 'green'} value={engine.coolantTempC} /></div>
+          </div>
+          <div className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
+            <div className="mb-1 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400"><Fuel className="h-4 w-4" /> Oil Pressure</div>
+            <div className="text-4xl font-bold text-white">{formatNumber(engine.oilPressurePsi)}<span className="text-xl text-slate-300"> psi</span></div>
+            <div className="mt-2"><Gauge max={90} tone={engine.oilPressurePsi == null ? 'cyan' : engine.oilPressurePsi < 30 ? 'red' : engine.oilPressurePsi < 40 ? 'amber' : 'green'} value={engine.oilPressurePsi} /></div>
+          </div>
+          <div className="col-span-2 rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
+            <div className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Runtime + Charging</div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div><div className="text-xs text-slate-400">Hours</div><div className="text-2xl font-bold text-white">{formatNumber(engine.hours)}</div></div>
+              <div><div className="text-xs text-slate-400">Alternator</div><div className="text-2xl font-bold text-white">{formatVoltage(engine.alternatorVoltage)}</div></div>
+              <div><div className="text-xs text-slate-400">House</div><div className="text-2xl font-bold text-white">{formatVoltage(battery.houseVoltage)}</div></div>
+            </div>
           </div>
         </div>
       </Card>

@@ -127,6 +127,7 @@ export function normalizeSignalKDelta(delta, options = {}) {
       if (typeof value === 'number') patch.wind = { ...(patch.wind ?? {}), twsKts: value * 1.94384 };
       break;
     case 'steering.autopilot.mode':
+    case 'steering.autopilot.state':
       if (typeof value === 'string') patch.autopilot = { ...(patch.autopilot ?? {}), state: value.toLowerCase() };
       break;
     case 'steering.autopilot.target.headingTrue':
@@ -185,10 +186,54 @@ export function normalizeSignalKDelta(delta, options = {}) {
         case 'electrical.alternators.0.voltage':
           if (typeof value === 'number') patch.engine = { ...(patch.engine ?? {}), alternatorVoltage: value };
           break;
+        case 'environment.inside.bilge.floodDetected':
+          if (typeof value === 'boolean') {
+            patch.bilge = {
+              ...(patch.bilge ?? {}),
+              alarm: value,
+              message: value ? 'Water Detected' : 'No Water Detected',
+            };
+          }
+          break;
         default:
           break;
       }
     }
   }
   return patch;
+}
+
+export function normalizeMqttMessage(topic, rawPayload) {
+  const text = String(rawPayload ?? '').trim();
+  const normalizedTopic = String(topic ?? '');
+
+  if (normalizedTopic === 'helmui/kiosk/brightness' || normalizedTopic.endsWith('/kiosk/brightness')) {
+    const value = Number(text);
+    if (!Number.isFinite(value)) return {};
+    return { ui: { brightness: Math.min(100, Math.max(35, Math.round(value))) } };
+  }
+
+  if (
+    normalizedTopic === 'helmui/autopilot/state' ||
+    normalizedTopic === 'helmui/autopilot/mode' ||
+    normalizedTopic.endsWith('/autopilot/state') ||
+    normalizedTopic.endsWith('/autopilot/mode')
+  ) {
+    if (!text) return {};
+    return { patch: { autopilot: { state: text.toLowerCase() } } };
+  }
+
+  if (
+    normalizedTopic === 'helmui/autopilot/heading' ||
+    normalizedTopic === 'helmui/autopilot/headingTarget' ||
+    normalizedTopic.endsWith('/autopilot/heading') ||
+    normalizedTopic.endsWith('/autopilot/headingTarget')
+  ) {
+    const value = Number(text);
+    if (!Number.isFinite(value)) return {};
+    const headingDeg = ((value % 360) + 360) % 360;
+    return { patch: { autopilot: { headingTarget: headingDeg } } };
+  }
+
+  return {};
 }

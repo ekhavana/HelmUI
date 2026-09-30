@@ -2,6 +2,7 @@ import L from 'leaflet';
 import { Anchor, BellRing, Wind } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useBoatStore } from '../../store/boatStore';
+import { displayedDepthFt } from '../../utils/depth';
 import { formatFeet, formatNumber } from '../../utils/formatters';
 import { anchorIcon, useLeafletMap, vesselIcon } from '../../utils/useLeafletMap';
 import { Card } from '../ui/Card';
@@ -9,7 +10,7 @@ import { Card } from '../ui/Card';
 export function AnchorScreen() {
   const anchor = useBoatStore((state) => state.data.anchor);
   const navigation = useBoatStore((state) => state.data.navigation);
-  const depth = useBoatStore((state) => state.data.depth.belowTransducerFt);
+  const depth = useBoatStore((state) => displayedDepthFt(state.data.depth.belowTransducerFt, state.settings.depthOffsetFt));
   const wind = useBoatStore((state) => state.data.wind);
   const setAnchorPosition = useBoatStore((state) => state.setAnchorPosition);
   const clearAnchorPosition = useBoatStore((state) => state.clearAnchorPosition);
@@ -69,6 +70,12 @@ export function AnchorScreen() {
       anchorMarkerRef.current = null;
       swingCircleRef.current?.remove();
       swingCircleRef.current = null;
+
+      // Before the anchor is dropped there is nothing to watch but the boat,
+      // so the map has to follow it rather than stay at the default origin.
+      if (hasVessel) {
+        map.setView([vesselLat!, vesselLon!], map.getZoom(), { animate: true });
+      }
     }
   }, [hasVessel, vesselLat, vesselLon, navigation.headingTrue, hasAnchor, anchorLat, anchorLon, anchor.radiusMeters]);
 
@@ -122,13 +129,13 @@ export function AnchorScreen() {
       <div className="relative min-h-0 overflow-hidden rounded-[2rem] border border-cyan-300/20">
         <div ref={mapContainerRef} className="absolute inset-0" />
         {!hasVessel && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 z-[1100] flex items-center justify-center">
             <div className="rounded-2xl border border-cyan-300/30 bg-slate-950/80 px-6 py-3 text-sm font-semibold text-cyan-200">
               Waiting for GPS fix…
             </div>
           </div>
         )}
-        <div className="pointer-events-none absolute left-4 top-4 z-10 rounded-xl border border-cyan-300/30 bg-slate-950/75 px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+        <div className="map-chip pointer-events-none absolute right-4 top-4 z-[1100] text-xs font-bold uppercase tracking-widest">
           Anchor Watch · Swing {formatNumber(anchor.radiusMeters)} m
         </div>
       </div>
