@@ -77,7 +77,16 @@ export function createSignalKClient({ url, onDelta, onStateChange }: SignalKClie
         'environment.water.temperature',
         'navigation.courseRhumbline.nextPoint.distance',
         'navigation.courseRhumbline.nextPoint.name',
+        'navigation.courseRhumbline.nextPoint.position',
+        'navigation.courseRhumbline.nextPoint.bearingTrue',
+        'navigation.courseRhumbline.previousPoint.position',
         'navigation.courseRhumbline.crossTrackError',
+        'navigation.courseRhumbline.bearingTrackTrue',
+        'navigation.courseGreatCircle.nextPoint.distance',
+        'navigation.courseGreatCircle.nextPoint.position',
+        'navigation.courseGreatCircle.nextPoint.bearingTrue',
+        'navigation.courseGreatCircle.previousPoint.position',
+        'navigation.courseGreatCircle.crossTrackError',
       ];
       socket?.send(
         JSON.stringify({

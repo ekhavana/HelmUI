@@ -86,6 +86,11 @@ export const emptyBoatData = {
     distanceNm: null as number | null,
     etaMinutes: null as number | null,
     crossTrackErrorNm: null as number | null,
+    bearingToWaypointDeg: null as number | null,
+    nextWaypointLat: null as number | null,
+    nextWaypointLon: null as number | null,
+    previousWaypointLat: null as number | null,
+    previousWaypointLon: null as number | null,
   },
   environment: {
     waterTempC: null as number | null,

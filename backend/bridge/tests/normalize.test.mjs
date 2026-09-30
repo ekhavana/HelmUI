@@ -99,6 +99,26 @@ test('normalizeSignalKDelta maps autopilot state path', () => {
   assert.equal(patch.autopilot.state, 'track');
 });
 
+test('normalizeSignalKDelta maps active route geometry (position and bearing)', () => {
+  const patch = normalizeSignalKDelta({
+    updates: [
+      {
+        values: [
+          { path: 'navigation.courseGreatCircle.nextPoint.position', value: { latitude: 37.9, longitude: -122.5 } },
+          { path: 'navigation.courseGreatCircle.previousPoint.position', value: { latitude: 37.7, longitude: -122.3 } },
+          { path: 'navigation.courseGreatCircle.nextPoint.bearingTrue', value: Math.PI / 2 },
+          { path: 'navigation.courseRhumbline.nextPoint.distance', value: 3704 },
+        ],
+      },
+    ],
+  });
+  assert.equal(patch.route.nextWaypointLat, 37.9);
+  assert.equal(patch.route.nextWaypointLon, -122.5);
+  assert.equal(patch.route.previousWaypointLat, 37.7);
+  assert.equal(Math.round(patch.route.bearingToWaypointDeg), 90);
+  assert.equal(Math.round(patch.route.distanceNm), 2);
+});
+
 test('normalizeSignalKDelta maps bilge floodDetected', () => {
   const wet = normalizeSignalKDelta({
     updates: [{ values: [{ path: 'environment.inside.bilge.floodDetected', value: true }] }],
