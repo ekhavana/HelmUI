@@ -22,9 +22,15 @@ const MODE = REPLAY_FILE ? 'replay' : 'live';
 const __dirname = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const TILES_ROOT = resolve(join(__dirname, 'tiles'));
 
+const MQTT_AUTOPILOT_COMMAND_PREFIX = process.env.BRIDGE_MQTT_AUTOPILOT_COMMAND_PREFIX ?? 'helmui/autopilot/command';
+const ALLOWED_COMMAND_TYPES = new Set(['state', 'heading', 'adjust', 'tack', 'advance']);
+
 const sourceState = defaultSourceState();
 const lastPatch = {};
 const lastUi = {};
+// Hoisted so the HTTP command route can publish. Stays null until MQTT connects
+// (and never connects in replay mode, so commands are refused there).
+let mqttClient = null;
 
 function markSource(name, connected, detail = '') {
   sourceState[name] = {
@@ -34,7 +40,76 @@ function markSource(name, connected, detail = '') {
   };
 }
 
+const CORS_HEADERS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type',
+};
+
+function refuseCommand(res, code, message) {
+  res.writeHead(code, { 'content-type': 'application/json', ...CORS_HEADERS });
+  res.end(JSON.stringify({ ok: false, error: message }));
+}
+
+// Outbound autopilot command path. The browser POSTs a neutral envelope and the
+// bridge republishes it to MQTT for Node-RED/the autopilot plugin to act on.
+// Refused in replay mode so recorded telemetry can never command hardware.
+function handleCommand(req, res) {
+  if (MODE === 'replay') {
+    refuseCommand(res, 503, 'commands are disabled in replay mode');
+    return;
+  }
+  if (!mqttClient || !mqttClient.connected) {
+    refuseCommand(res, 503, 'command transport (mqtt) is not connected');
+    return;
+  }
+
+  let body = '';
+  let tooLarge = false;
+  req.on('data', (chunk) => {
+    body += chunk;
+    if (body.length > 4096) {
+      tooLarge = true;
+      req.destroy();
+    }
+  });
+  req.on('end', () => {
+    if (tooLarge) return;
+    let parsed;
+    try {
+      parsed = JSON.parse(body || '{}');
+    } catch {
+      refuseCommand(res, 400, 'invalid JSON body');
+      return;
+    }
+    const type = String(parsed?.type ?? '');
+    if (!ALLOWED_COMMAND_TYPES.has(type)) {
+      refuseCommand(res, 400, `unknown command type: ${type}`);
+      return;
+    }
+    const value = parsed?.value === undefined || parsed?.value === null ? '' : String(parsed.value);
+    const topic = `${MQTT_AUTOPILOT_COMMAND_PREFIX}/${type}`;
+    mqttClient.publish(topic, value, { qos: 1 }, (err) => {
+      if (err) {
+        refuseCommand(res, 502, 'failed to publish command');
+        return;
+      }
+      res.writeHead(200, { 'content-type': 'application/json', ...CORS_HEADERS });
+      res.end(JSON.stringify({ ok: true, topic, value, timestamp: new Date().toISOString() }));
+    });
+  });
+}
+
 const server = createServer((req, res) => {
+  if (req.method === 'OPTIONS' && req.url === '/command') {
+    res.writeHead(204, CORS_HEADERS).end();
+    return;
+  }
+  if (req.method === 'POST' && req.url === '/command') {
+    handleCommand(req, res);
+    return;
+  }
+
   if (req.url.startsWith('/tiles/')) {
     const fileName = req.url.slice('/tiles/'.length).split('?')[0];
     const filePath = resolve(TILES_ROOT, fileName);
@@ -174,6 +249,7 @@ function setupSignalK() {
 
 function setupMqtt() {
   const client = mqtt.connect(MQTT_URL);
+  mqttClient = client;
   client.on('connect', () => {
     markSource('mqtt', true, 'connected');
     markSource('nodered', true, 'mqtt bridge');

@@ -39,6 +39,13 @@ function bool(value: unknown): boolean | null {
   return typeof value === 'boolean' ? value : null;
 }
 
+function parseLatLon(value: unknown): { lat: number; lon: number } | null {
+  if (!value || typeof value !== 'object' || !('latitude' in value) || !('longitude' in value)) return null;
+  const lat = numeric((value as Record<string, unknown>).latitude);
+  const lon = numeric((value as Record<string, unknown>).longitude);
+  return lat !== null && lon !== null ? { lat, lon } : null;
+}
+
 function mergePatch(target: BoatDataPatch, patch: BoatDataPatch): void {
   for (const key of Object.keys(patch) as Array<keyof BoatDataPatch>) {
     if (key === 'ais') {
@@ -163,12 +170,30 @@ function mapValue(update: SignalKValueUpdate): BoatDataPatch {
     case 'environment.water.temperature':
       return numberValue === null ? {} : { environment: { waterTempC: kelvinToCelsius(numberValue) } };
     case 'navigation.courseRhumbline.nextPoint.distance':
+    case 'navigation.courseGreatCircle.nextPoint.distance':
       return numberValue === null ? {} : { route: { distanceNm: numberValue / 1852 } };
     case 'navigation.courseRhumbline.crossTrackError':
+    case 'navigation.courseGreatCircle.crossTrackError':
       return numberValue === null ? {} : { route: { crossTrackErrorNm: Math.abs(numberValue) / 1852 } };
-    case 'navigation.courseRhumbline.nextPoint.name': {
+    case 'navigation.courseRhumbline.nextPoint.name':
+    case 'navigation.courseGreatCircle.nextPoint.name': {
       const name = text(value);
       return name === null ? {} : { route: { nextWaypoint: name } };
+    }
+    case 'navigation.courseRhumbline.bearingTrackTrue':
+    case 'navigation.courseGreatCircle.bearingTrackTrue':
+    case 'navigation.courseRhumbline.nextPoint.bearingTrue':
+    case 'navigation.courseGreatCircle.nextPoint.bearingTrue':
+      return numberValue === null ? {} : { route: { bearingToWaypointDeg: radiansToDegrees(numberValue) } };
+    case 'navigation.courseRhumbline.nextPoint.position':
+    case 'navigation.courseGreatCircle.nextPoint.position': {
+      const point = parseLatLon(value);
+      return point === null ? {} : { route: { nextWaypointLat: point.lat, nextWaypointLon: point.lon } };
+    }
+    case 'navigation.courseRhumbline.previousPoint.position':
+    case 'navigation.courseGreatCircle.previousPoint.position': {
+      const point = parseLatLon(value);
+      return point === null ? {} : { route: { previousWaypointLat: point.lat, previousWaypointLon: point.lon } };
     }
     case 'navigation.position': {
       if (value && typeof value === 'object' && 'latitude' in value && 'longitude' in value) {

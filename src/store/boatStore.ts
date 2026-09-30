@@ -21,6 +21,8 @@ import type { AlarmItem } from '../domain/alarms/types';
 import { mapSignalKDelta, type BoatDataPatch } from '../signalk/mapDelta';
 import type { SignalKConnectionState, SignalKDeltaMessage } from '../signalk/types';
 import { haversineMeters } from '../utils/geo';
+import { describeCommand, type AutopilotCommand } from '../domain/autopilot/commands';
+import { dispatchAutopilotCommand, type CommandResult } from '../signalk/commands';
 
 export type AppMode = 'helm' | 'chart' | 'anchor' | 'engine' | 'systems' | 'ai' | 'menu';
 
@@ -55,6 +57,7 @@ interface BoatStore {
   alarms: AlarmItem[];
   dashboards: Record<DashboardScreenId, DashboardLayout>;
   editMode: boolean;
+  autopilotControl: AutopilotControlState;
   setMode: (mode: AppMode) => void;
   setBoatData: (data: BoatData) => void;
   updateSettings: (patch: Partial<UiSettings>) => void;
@@ -73,8 +76,16 @@ interface BoatStore {
   applyBridgeMessage: (message: BridgeMessage) => void;
   applySignalKDelta: (delta: SignalKDeltaMessage, selfContext?: string) => void;
   refreshAlarms: () => void;
+  sendAutopilotCommand: (command: AutopilotCommand) => Promise<CommandResult>;
   exportSettingsProfile: () => HelmSettingsProfile;
   importSettingsProfile: (value: unknown) => boolean;
+}
+
+export interface AutopilotControlState {
+  pending: boolean;
+  lastCommand: string | null;
+  lastResult: CommandResult | null;
+  lastAt: string | null;
 }
 
 const defaultSettings: UiSettings = {
@@ -190,6 +201,12 @@ export const useBoatStore = create<BoatStore>()(
       alarms: [] as AlarmItem[],
       dashboards: defaultDashboards(),
       editMode: false,
+      autopilotControl: {
+        pending: false,
+        lastCommand: null,
+        lastResult: null,
+        lastAt: null,
+      } as AutopilotControlState,
       setMode: (mode) => set({ mode }),
       setEditMode: (editMode) => set({ editMode }),
       moveTile: (screen, tileId, direction) =>
@@ -373,6 +390,20 @@ export const useBoatStore = create<BoatStore>()(
             sourceHealth: state.sourceHealth,
           }),
         })),
+      sendAutopilotCommand: async (command) => {
+        const label = describeCommand(command);
+        // Replayed telemetry must never command real hardware. The bridge also
+        // refuses commands in replay mode; this is the client-side guard.
+        if (get().telemetryMode === 'replay') {
+          const result: CommandResult = { ok: false, detail: 'Controls are disabled in replay mode' };
+          set({ autopilotControl: { pending: false, lastCommand: label, lastResult: result, lastAt: new Date().toISOString() } });
+          return result;
+        }
+        set((state) => ({ autopilotControl: { ...state.autopilotControl, pending: true, lastCommand: label } }));
+        const result = await dispatchAutopilotCommand(command);
+        set({ autopilotControl: { pending: false, lastCommand: label, lastResult: result, lastAt: new Date().toISOString() } });
+        return result;
+      },
       exportSettingsProfile: (): HelmSettingsProfile => {
         const state = get();
         return {
