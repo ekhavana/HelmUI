@@ -1,6 +1,17 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { runtimeConfig } from '../config/runtime';
+import { connectivityDefaults, runtimeConfig, type ChartLayer, type ConnectivitySettings } from '../config/runtime';
+import {
+  DASHBOARD_SCREENS,
+  defaultDashboardLayout,
+  moveTileInLayout,
+  removeTileFromLayout,
+  addTileToLayout,
+  sanitizeLayout,
+  type DashboardLayout,
+  type DashboardScreenId,
+  type TileMoveDirection,
+} from '../domain/dashboard/layout';
 import { emptyBoatData, type BoatData } from '../data/boatData';
 import { mergeAisContacts, summarizeAis } from '../domain/ais/aggregateAis';
 import type { BridgeMessage, BridgeSourceName, BridgeSourceState, TelemetryMode } from '../bridge/types';
@@ -22,6 +33,9 @@ export interface UiSettings {
   depthOffsetFt: number;
   autoLaunch: boolean;
   touchLock: boolean;
+  chartLayer: ChartLayer;
+  chartSeamarks: boolean;
+  connectivity: ConnectivitySettings;
 }
 
 export interface AssistantMessage {
@@ -39,10 +53,17 @@ interface BoatStore {
   telemetryMode: TelemetryMode;
   telemetryUpdatedAt: string | null;
   alarms: AlarmItem[];
+  dashboards: Record<DashboardScreenId, DashboardLayout>;
+  editMode: boolean;
   setMode: (mode: AppMode) => void;
   setBoatData: (data: BoatData) => void;
   updateSettings: (patch: Partial<UiSettings>) => void;
   resetSettings: () => void;
+  setEditMode: (editMode: boolean) => void;
+  moveTile: (screen: DashboardScreenId, tileId: string, direction: TileMoveDirection) => void;
+  removeTile: (screen: DashboardScreenId, tileId: string) => void;
+  addTile: (screen: DashboardScreenId, columnId: string, tileId: string) => void;
+  resetDashboard: (screen: DashboardScreenId) => void;
   setAnchorRadius: (radiusMeters: number) => void;
   setAnchorPosition: (lat: number, lon: number) => void;
   clearAnchorPosition: () => void;
@@ -63,7 +84,29 @@ const defaultSettings: UiSettings = {
   depthOffsetFt: 0,
   autoLaunch: true,
   touchLock: false,
+  chartLayer: runtimeConfig.chart.layer,
+  chartSeamarks: runtimeConfig.chart.seamarks,
+  connectivity: { ...connectivityDefaults },
 };
+
+function defaultDashboards(): Record<DashboardScreenId, DashboardLayout> {
+  return Object.fromEntries(
+    DASHBOARD_SCREENS.map((screen) => [screen, defaultDashboardLayout(screen)]),
+  ) as Record<DashboardScreenId, DashboardLayout>;
+}
+
+function sanitizeDashboards(
+  persisted: Partial<Record<DashboardScreenId, unknown>> | undefined,
+  fallback: Record<DashboardScreenId, DashboardLayout>,
+): Record<DashboardScreenId, DashboardLayout> {
+  if (!persisted || typeof persisted !== 'object') return fallback;
+  return Object.fromEntries(
+    DASHBOARD_SCREENS.map((screen) => [
+      screen,
+      screen in persisted ? sanitizeLayout(screen, persisted[screen]) : fallback[screen],
+    ]),
+  ) as Record<DashboardScreenId, DashboardLayout>;
+}
 
 const defaultAiMessages: AssistantMessage[] = [
   { role: 'assistant', text: 'Assistant online. Ask for route status, engine summary, anchor watch, or systems snapshot.' },
@@ -145,7 +188,38 @@ export const useBoatStore = create<BoatStore>()(
       telemetryMode: 'live' as TelemetryMode,
       telemetryUpdatedAt: null as string | null,
       alarms: [] as AlarmItem[],
+      dashboards: defaultDashboards(),
+      editMode: false,
       setMode: (mode) => set({ mode }),
+      setEditMode: (editMode) => set({ editMode }),
+      moveTile: (screen, tileId, direction) =>
+        set((state) => ({
+          dashboards: {
+            ...state.dashboards,
+            [screen]: moveTileInLayout(state.dashboards[screen], tileId, direction),
+          },
+        })),
+      removeTile: (screen, tileId) =>
+        set((state) => ({
+          dashboards: {
+            ...state.dashboards,
+            [screen]: removeTileFromLayout(state.dashboards[screen], tileId),
+          },
+        })),
+      addTile: (screen, columnId, tileId) =>
+        set((state) => ({
+          dashboards: {
+            ...state.dashboards,
+            [screen]: addTileToLayout(state.dashboards[screen], columnId, tileId),
+          },
+        })),
+      resetDashboard: (screen) =>
+        set((state) => ({
+          dashboards: {
+            ...state.dashboards,
+            [screen]: defaultDashboardLayout(screen),
+          },
+        })),
       setBoatData: (data) => set({ data }),
       updateSettings: (patch) =>
         set((state) => ({
@@ -345,6 +419,7 @@ export const useBoatStore = create<BoatStore>()(
         mode: state.mode,
         settings: state.settings,
         aiMessages: state.aiMessages,
+        dashboards: state.dashboards,
         data: {
           anchor: {
             radiusMeters: state.data.anchor.radiusMeters,
@@ -356,6 +431,7 @@ export const useBoatStore = create<BoatStore>()(
           mode: AppMode;
           settings: UiSettings;
           aiMessages: AssistantMessage[];
+          dashboards: Record<DashboardScreenId, DashboardLayout>;
           data: {
             anchor: {
               radiusMeters: number;
@@ -370,7 +446,12 @@ export const useBoatStore = create<BoatStore>()(
             ...currentState.settings,
             ...(persisted.settings ?? {}),
             depthOffsetFt: persisted.settings?.depthOffsetFt ?? currentState.settings.depthOffsetFt,
+            connectivity: {
+              ...currentState.settings.connectivity,
+              ...(persisted.settings?.connectivity ?? {}),
+            },
           },
+          dashboards: sanitizeDashboards(persisted.dashboards, currentState.dashboards),
           aiMessages: persisted.aiMessages?.length ? persisted.aiMessages : currentState.aiMessages,
           sourceHealth: currentState.sourceHealth,
           telemetryMode: currentState.telemetryMode,

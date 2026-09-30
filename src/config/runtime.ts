@@ -59,6 +59,47 @@ function resolveSignalKUrl(): string {
   return `ws://${host}:3000/signalk/v1/stream?subscribe=all`;
 }
 
+export interface ConnectivitySettings {
+  signalKUrl: string;
+  bridgeWsUrl: string;
+  bridgeHttpUrl: string;
+}
+
+// Endpoints baked from env/defaults. In-app connectivity edits are persisted to
+// the store and layered on top of these; they take effect on the next reload.
+export const connectivityDefaults: ConnectivitySettings = {
+  signalKUrl: resolveSignalKUrl(),
+  bridgeWsUrl: (import.meta.env.VITE_TELEMETRY_BRIDGE_WS_URL as string | undefined) ?? 'ws://localhost:4300/ws',
+  bridgeHttpUrl: (import.meta.env.VITE_TELEMETRY_BRIDGE_HTTP_URL as string | undefined) ?? 'http://localhost:4300',
+};
+
+// The persisted store hydrates synchronously, but the module-level connection
+// URLs below are read before React mounts, so we peek at localStorage directly
+// to honor a user's saved endpoints on cold start.
+function readPersistedConnectivity(): Partial<ConnectivitySettings> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem('helmui-settings');
+    if (!raw) return {};
+    const conn = (JSON.parse(raw) as { state?: { settings?: { connectivity?: unknown } } })?.state?.settings
+      ?.connectivity as Partial<Record<keyof ConnectivitySettings, unknown>> | undefined;
+    if (!conn || typeof conn !== 'object') return {};
+    const pick = (value: unknown) => (typeof value === 'string' && value.trim() ? value.trim() : undefined);
+    return {
+      signalKUrl: pick(conn.signalKUrl),
+      bridgeWsUrl: pick(conn.bridgeWsUrl),
+      bridgeHttpUrl: pick(conn.bridgeHttpUrl),
+    };
+  } catch {
+    return {};
+  }
+}
+
+const connectivityOverrides = readPersistedConnectivity();
+const resolvedSignalKUrl = connectivityOverrides.signalKUrl ?? connectivityDefaults.signalKUrl;
+const resolvedBridgeWsUrl = connectivityOverrides.bridgeWsUrl ?? connectivityDefaults.bridgeWsUrl;
+const resolvedBridgeHttpUrl = connectivityOverrides.bridgeHttpUrl ?? connectivityDefaults.bridgeHttpUrl;
+
 const signalKEnabledEnv = import.meta.env.VITE_SIGNALK_ENABLED;
 const signalKEnabled = signalKEnabledEnv !== undefined ? signalKEnabledEnv === 'true' : true;
 
@@ -75,8 +116,8 @@ export const runtimeConfig = {
   profile,
   telemetry: {
     transport: telemetryTransport,
-    bridgeWsUrl: import.meta.env.VITE_TELEMETRY_BRIDGE_WS_URL ?? 'ws://localhost:4300/ws',
-    bridgeHttpUrl: import.meta.env.VITE_TELEMETRY_BRIDGE_HTTP_URL ?? 'http://localhost:4300',
+    bridgeWsUrl: resolvedBridgeWsUrl,
+    bridgeHttpUrl: resolvedBridgeHttpUrl,
     requireLiveData: import.meta.env.VITE_REQUIRE_LIVE_DATA !== 'false',
     activeSources: (telemetryTransport === 'bridge'
       ? ['signalk', 'mqtt', 'nodered']
@@ -84,7 +125,7 @@ export const runtimeConfig = {
   },
   signalK: {
     enabled: signalKEnabled,
-    url: resolveSignalKUrl(),
+    url: resolvedSignalKUrl,
   },
   chart: {
     tileUrlTemplate: import.meta.env.VITE_CHART_TILE_URL_TEMPLATE ?? '',

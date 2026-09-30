@@ -2,6 +2,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef } from 'react';
 import { CHART_LAYERS, runtimeConfig } from '../config/runtime';
+import { useBoatStore } from '../store/boatStore';
 
 export interface LeafletMapOptions {
   zoom?: number;
@@ -12,6 +13,11 @@ export function useLeafletMap(options: LeafletMapOptions = {}) {
   const { zoom = 13, zoomControl = false } = options;
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  // Chart rasters live in their own group so the layer/seamark selection can be
+  // swapped live from settings without tearing down the map or its base tiles.
+  const chartGroupRef = useRef<L.LayerGroup | null>(null);
+  const chartLayer = useBoatStore((state) => state.settings.chartLayer);
+  const chartSeamarks = useBoatStore((state) => state.settings.chartSeamarks);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -23,7 +29,7 @@ export function useLeafletMap(options: LeafletMapOptions = {}) {
       attributionControl: false,
     });
 
-    const { offlineOnly, tileUrlTemplate, layer, seamarks } = runtimeConfig.chart;
+    const { offlineOnly, tileUrlTemplate } = runtimeConfig.chart;
 
     if (offlineOnly) {
       L.tileLayer(tileUrlTemplate || '/tiles/base.svg', { maxZoom: 19 }).addTo(map);
@@ -33,22 +39,7 @@ export function useLeafletMap(options: LeafletMapOptions = {}) {
       L.tileLayer(tileUrlTemplate || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
       }).addTo(map);
-
-      for (const tile of CHART_LAYERS[layer].tiles) {
-        L.tileLayer(tile.url, {
-          maxZoom: tile.maxZoom ?? 19,
-          maxNativeZoom: tile.maxNativeZoom,
-          opacity: tile.opacity ?? 1,
-        }).addTo(map);
-      }
-
-      if (seamarks) {
-        L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          maxNativeZoom: 18,
-          opacity: 0.9,
-        }).addTo(map);
-      }
+      chartGroupRef.current = L.layerGroup().addTo(map);
     }
 
     mapRef.current = map;
@@ -56,8 +47,33 @@ export function useLeafletMap(options: LeafletMapOptions = {}) {
     return () => {
       map.remove();
       mapRef.current = null;
+      chartGroupRef.current = null;
     };
   }, []);
+
+  // Rebuild the chart raster stack whenever the operator picks a different chart
+  // layer or toggles seamarks in settings.
+  useEffect(() => {
+    if (runtimeConfig.chart.offlineOnly) return;
+    const group = chartGroupRef.current;
+    if (!group) return;
+
+    group.clearLayers();
+    for (const tile of CHART_LAYERS[chartLayer].tiles) {
+      L.tileLayer(tile.url, {
+        maxZoom: tile.maxZoom ?? 19,
+        maxNativeZoom: tile.maxNativeZoom,
+        opacity: tile.opacity ?? 1,
+      }).addTo(group);
+    }
+    if (chartSeamarks) {
+      L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        maxNativeZoom: 18,
+        opacity: 0.9,
+      }).addTo(group);
+    }
+  }, [chartLayer, chartSeamarks]);
 
   return { containerRef, mapRef };
 }
