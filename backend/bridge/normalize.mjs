@@ -175,13 +175,34 @@ export function normalizeSignalKDelta(delta, options = {}) {
           if (typeof value === 'number') patch.environment = { ...(patch.environment ?? {}), waterTempC: value - 273.15 };
           break;
         case 'navigation.courseRhumbline.nextPoint.distance':
+        case 'navigation.courseGreatCircle.nextPoint.distance':
           if (typeof value === 'number') patch.route = { ...(patch.route ?? {}), distanceNm: value / 1852 };
           break;
         case 'navigation.courseRhumbline.crossTrackError':
+        case 'navigation.courseGreatCircle.crossTrackError':
           if (typeof value === 'number') patch.route = { ...(patch.route ?? {}), crossTrackErrorNm: Math.abs(value) / 1852 };
           break;
         case 'navigation.courseRhumbline.nextPoint.name':
+        case 'navigation.courseGreatCircle.nextPoint.name':
           if (typeof value === 'string') patch.route = { ...(patch.route ?? {}), nextWaypoint: value };
+          break;
+        case 'navigation.courseRhumbline.bearingTrackTrue':
+        case 'navigation.courseGreatCircle.bearingTrackTrue':
+        case 'navigation.courseRhumbline.nextPoint.bearingTrue':
+        case 'navigation.courseGreatCircle.nextPoint.bearingTrue':
+          if (typeof value === 'number') patch.route = { ...(patch.route ?? {}), bearingToWaypointDeg: (((value * 180) / Math.PI) % 360 + 360) % 360 };
+          break;
+        case 'navigation.courseRhumbline.nextPoint.position':
+        case 'navigation.courseGreatCircle.nextPoint.position':
+          if (value && typeof value === 'object' && typeof value.latitude === 'number' && typeof value.longitude === 'number') {
+            patch.route = { ...(patch.route ?? {}), nextWaypointLat: value.latitude, nextWaypointLon: value.longitude };
+          }
+          break;
+        case 'navigation.courseRhumbline.previousPoint.position':
+        case 'navigation.courseGreatCircle.previousPoint.position':
+          if (value && typeof value === 'object' && typeof value.latitude === 'number' && typeof value.longitude === 'number') {
+            patch.route = { ...(patch.route ?? {}), previousWaypointLat: value.latitude, previousWaypointLon: value.longitude };
+          }
           break;
         case 'electrical.alternators.0.voltage':
           if (typeof value === 'number') patch.engine = { ...(patch.engine ?? {}), alternatorVoltage: value };
